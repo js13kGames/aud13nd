@@ -1,0 +1,342 @@
+import $ from "./Gloop/util/$dom";
+
+function pluginAudio() {
+  const game = this;
+
+  // initialize web audio
+  const ctx = new AudioContext();
+
+  // enable on user gestures
+  $(document.body).on("click", () => {
+    if (ctx.state === "suspended") {
+      console.log("ENABLED WEB AUDIO");
+      ctx.resume();
+    }
+  });
+  // a bunch of analyzers for each instrument
+  const graphNote = new AnalyserNode(ctx);
+  const graphKick = new AnalyserNode(ctx);
+  const graphSnare = new AnalyserNode(ctx);
+  const graphHat = new AnalyserNode(ctx);
+  // a bunch of gains to control each instrument
+  const gainNote = new GainNode(ctx);
+  const gainKick = new GainNode(ctx);
+  const gainSnare = new GainNode(ctx);
+  const gainHat = new GainNode(ctx);
+  // compress loudest parts to prevent clipping
+  const limiter = new DynamicsCompressorNode(ctx, {
+    ratio: 20,
+    knee: 1,
+    attack: 0,
+    release: 0.015
+  });
+  // final gain to control volume
+  const gainVolume = new GainNode(ctx);
+  // wired it all together
+  gainNote.connect(graphNote).connect(limiter);
+  gainKick.connect(graphKick).connect(limiter);
+  gainSnare.connect(graphSnare).connect(limiter);
+  gainHat.connect(graphHat).connect(limiter);
+  limiter.connect(gainVolume).connect(ctx.destination);
+
+  // input and final gains
+  // const input = new GainNode(ctx, { gain: 1 });
+  // const volume = new GainNode(ctx);
+  // reverb gains
+  // const wet = new GainNode(ctx);
+  // const dry = new GainNode(ctx);
+  // mixer for reverb
+  // const compressor = new DynamicsCompressorNode(ctx, {
+  //   ratio: 4, // 4:1
+  //   threshold: -12, // dB
+  // });
+  // final limiter, compress loudest parts to prevent clipping
+
+  // const brickwall = new DynamicsCompressorNode(ctx, {
+  //   ratio: 40,
+  //   threshold: -5,
+  //   knee: 0,
+  //   attack: 0.001,
+  //   release: 0.1
+  // });
+  // reverb nodes
+  // const buffer = new AudioBuffer({
+  //   numberOfChannels: 2,
+  //   length: ctx.sampleRate * 2, // 2 seconds
+  //   sampleRate: ctx.sampleRate,
+  // });
+  // const decay = 1;
+  // const left = buffer.getChannelData(0);
+  // const right = buffer.getChannelData(1);
+  // const len = buffer.length;
+  // for (let i = 0; i < len; i++) {
+  //   left[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay);
+  //   right[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay);
+  // }
+  // const reverb = new ConvolverNode(ctx, { buffer });
+  // wire up audio nodes
+  // input.connect(wet).connect(reverb).connect(compressor);
+  // input.connect(dry).connect(compressor);
+  // compressor.connect(volume).connect(analyser).connect(ctx.destination);
+
+  // input.connect(wet).connect(reverb).connect(compressor);
+  // input.connect(dry).connect(compressor).connect(graphNote);
+  // graphNote.connect(brickwall);
+  // graphKick.connect(brickwall);
+  // graphSnare.connect(brickwall);
+  // graphHat.connect(brickwall);
+  // brickwall.connect(volume).connect(ctx.destination);
+
+  const renderAnalyzers = (opts) => {
+    renderAnalyzer(graphHat, { ...opts, hue: 290 });
+    renderAnalyzer(graphSnare, { ...opts, hue: 210 });
+    renderAnalyzer(graphKick, { ...opts, hue: 185 });
+    renderAnalyzer(graphNote, { ...opts, hue: 120 });
+  }
+
+  // draw analyzer graph of the audio stream
+  const renderAnalyzer = (node, { x, y, w, h, s, hue, alpha }) => {
+    const { ctx } = game.canvas;
+    // draw the frequency line
+    ctx.lineWidth = s;
+    ctx.lineJoin = "round";
+    ctx.strokeStyle = `hsla(${hue},100%,50%,${alpha})`;
+    ctx.beginPath();
+    // read analyser data
+    const bufferLength = node.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+    node.getByteTimeDomainData(dataArray);
+    const sliceWidth = (w * 1.0) / bufferLength;
+    for (let dx = 0, i = 0; i < bufferLength; i++) {
+      const v = dataArray[i] / 128.0;
+      const dy = (v * h) / 2;
+      ctx[i===0 ? "moveTo" : "lineTo"](x + dx, y + dy);
+      dx += sliceWidth;
+    }
+    ctx.lineTo(w + x, y + h / 2);
+    ctx.stroke();
+  };
+
+  // generate and shape a tone connected to the output
+  const playLead = (start, frequency=440, duration=0.5) => {
+    const {
+      wave,
+      attack,
+      decay,
+      sustain,
+      release
+    } = game.state.params;
+    //
+    const filter = new BiquadFilterNode(ctx, {
+      type: 'lowshelf',
+      frequency: 200,
+      gain: 5
+    });
+    // create a tone
+    const osc = new OscillatorNode(ctx, {
+      type: wave,
+      frequency
+    });
+    // shape the tone
+    const env = new GainNode(ctx);
+    /*
+       /\___
+     _/     \_
+      A D S R
+    */
+    // shape envelope
+    env.gain.setValueAtTime(0, start);
+    env.gain.exponentialRampToValueAtTime(1, start + (attack * duration));
+    env.gain.exponentialRampToValueAtTime(sustain, start + (attack * duration) + (decay * duration));
+    env.gain.exponentialRampToValueAtTime(0.00001, start + duration + (release * duration));
+    // begin/end tone
+    osc.start(start);
+    osc.stop(start + duration + (release * duration));
+    // cleanup
+    osc.onended = () => {
+      osc.disconnect();
+      env.disconnect();
+    };
+    osc.connect(env).connect(gainNote); // .connect(filter)
+  }
+
+  // drum kick ~ E3/4
+  const playKick = (start, frequency=167.1, duration=0.5) => {
+    // create a tone
+    const osc = new OscillatorNode(ctx, {
+      type: "sine",
+      frequency
+    });
+    // shape the envelope
+    const env = new GainNode(ctx);
+    osc.frequency.setValueAtTime(frequency, start + 0.001);
+    env.gain.linearRampToValueAtTime(1, start + 0.1)
+    osc.frequency.exponentialRampToValueAtTime(1, start + duration);
+    env.gain.exponentialRampToValueAtTime(0.01, start + duration);
+    env.gain.linearRampToValueAtTime(0, start + duration + 0.1)
+    // begin/end
+    osc.start(start);
+    osc.stop(start + duration + 0.1);
+    // cleanup
+    osc.onended = () => {
+      osc.disconnect();
+      env.disconnect();
+    };
+    // wired up
+    osc.connect(env).connect(gainKick);
+  };
+
+  // drum snare ~ G2/8
+  const playSnare = (start, frequency=100, duration=0.25) => {
+    // noise and filter
+    const noise = makeNoiseBuffer();
+    const filter = new BiquadFilterNode(ctx, {
+      type: 'highpass',
+      frequency: 1000
+    });
+    // shape noise envelope
+    const envNoise = new GainNode(ctx);
+    envNoise.gain.setValueAtTime(1, start);
+    envNoise.gain.exponentialRampToValueAtTime(0.01, start + duration);
+    // shape tone envelope
+    const envTone = new GainNode(ctx);
+    const tone = new OscillatorNode(ctx, { type: "triangle", frequency });
+    envTone.gain.setValueAtTime(0.7, start);
+    envTone.gain.exponentialRampToValueAtTime(0.01, start + duration / 2);
+    // begin/end
+    noise.start(start)
+    noise.stop(start + duration);
+    tone.start(start)
+    tone.stop(start + duration);
+    // cleanup
+    tone.onended = () => {
+      tone.disconnect();
+      noise.disconnect();
+    };
+    // wired up
+    noise.connect(filter).connect(envNoise).connect(gainSnare);
+    tone.connect(envTone).connect(gainSnare);
+  };
+
+  // make some audio noise
+  const makeNoiseBuffer = () => {
+    const size = ctx.sampleRate;
+    const buffer = new AudioBuffer({
+      numberOfChannels: 1,
+      length: size,
+      sampleRate: size,
+    });
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < size; i++) {
+      data[i] = Math.random() * 2 - 1;
+    }
+    return new AudioBufferSourceNode(ctx, { buffer });
+  };
+
+  // drum clap ~ C3/5•
+  // const playClap = (start, frequency=130, duration=0.3) => {
+  //   const pulseWidth = 0.025;
+  //   // noise and filter
+  //   const noise = makeNoiseBuffer();
+  //   const filter = new BiquadFilterNode(ctx, {
+  //     type: 'highpass',
+  //     frequency: frequency * 2
+  //   });
+  //   // shape noise envelope
+  //   const env = new GainNode(ctx);
+  //   env.gain.setValueAtTime(1, start);
+  //   env.gain.exponentialRampToValueAtTime(0.1, start + pulseWidth);
+  //   env.gain.setValueAtTime(1, start + pulseWidth);
+  //   env.gain.exponentialRampToValueAtTime(0.1, start + 2 * pulseWidth);
+  //   env.gain.setValueAtTime(1, start + 2 * pulseWidth);
+  //   env.gain.exponentialRampToValueAtTime(0.001, start + duration);
+  //   // begin/end
+  //   noise.start(start)
+  //   noise.stop(start + duration);
+  //   // cleanup
+  //   noise.onended = () => {
+  //     env.disconnect();
+  //     filter.disconnect();
+  //     noise.disconnect();
+  //   };
+  //   // wired up
+  //   noise.connect(filter).connect(env).connect(graphClap);
+  // };
+
+  // drum hat ~ C3/2•
+  const playHat = (start, frequency=130.81, duration=1.5) => {
+    // shape the envelope
+    const env = new GainNode(ctx);
+    env.gain.setValueAtTime(0.00001, start);
+    env.gain.exponentialRampToValueAtTime(1, start + 0.067 * duration);
+    env.gain.exponentialRampToValueAtTime(0.3, start + 0.1 * duration);
+    env.gain.exponentialRampToValueAtTime(0.00001, start + duration);
+    // filters
+    const bandpass = new BiquadFilterNode(ctx, {
+      type: 'bandpass',
+      frequency: 20000,
+      Q: 0.2
+    });
+    const highpass = new BiquadFilterNode(ctx, {
+      type: 'highpass',
+      frequency: 5000
+    });
+    // wired up
+    bandpass.connect(highpass).connect(env).connect(gainHat);
+    // layered square waves
+    ([1, 1.3420, 1.2312, 1.6532, 1.9523, 2.1523]).forEach(ratio => {
+      const osc = new OscillatorNode(ctx, {
+        type: "square",
+        frequency: frequency * ratio
+      });
+      // begin/end
+      osc.start(start);
+      osc.stop(start + duration);
+      // cleanup
+      osc.onended = () => {
+        osc.disconnect();
+      };
+      // wired
+      osc.connect(bandpass);
+    });
+  };
+
+  const setGain = (node, value) => {
+    value = value === 0 ? 0.000001 : value;
+    node.gain.exponentialRampToValueAtTime(value, ctx.currentTime);
+  };
+
+  game.on("state_change", ({ key, value: params, previous })=>{
+    if (key !== "params"){
+      return;
+    }
+    if (params.volume !== previous?.volume){
+      setGain(gainVolume, params.volume);
+    }
+    if (params.note !== previous?.note){
+      setGain(gainNote, params.note);
+    }
+    if (params.kick !== previous?.kick){
+      setGain(gainKick, params.kick);
+    }
+    if (params.snare !== previous?.snare){
+      setGain(gainSnare, params.snare);
+    }
+    if (params.hat !== previous?.hat){
+      setGain(gainHat, params.hat);
+    }
+  });
+
+  return {
+    name: "audio",
+    ctx,
+    playLead,
+    playKick,
+    playSnare,
+    // playClap,
+    playHat,
+    renderAnalyzers
+  }
+}
+
+export default pluginAudio;

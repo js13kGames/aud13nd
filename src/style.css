@@ -1,0 +1,22 @@
+html {
+  min-height: 100%;
+}
+body {
+  font: 14px monospace;
+  color: #333;
+  background-color: #000;
+  margin: 0;
+}
+
+input[type-text], select {
+  font: 12px monospace;
+}
+
+input[type-button] {
+  font: 14px monospace;
+  padding: 2px 4px;
+}
+
+canvas {
+  background: linear-gradient(#2a2e33,#25262A);
+}
