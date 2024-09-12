@@ -109,11 +109,7 @@ function pluginCanvas() {
 
   const clear = () => {
     const { w, h } = game.state.viewport;
-    // mostly cleared, but leaves some motion trails
-    ctx.globalAlpha = .25;
-    ctx.fillStyle = "#25262A";
-    ctx.fillRect(0, 0, w, h);
-    ctx.globalAlpha = 1;
+    ctx.clearRect(0, 0, w, h);
     // empty interactive target positions
     sliders = [];
     buttons = [];
@@ -127,17 +123,17 @@ function pluginCanvas() {
     h -= p + p;
     // gradient fill
     const gradient = ctx.createLinearGradient(x+w/2, y, x+w/2, h);
-    gradient.addColorStop(0, c1 ?? "rgba(40,46,51,.5)");
-    gradient.addColorStop(1, c2 ?? "rgba(29,30,34,.75)");
+    gradient.addColorStop(0, c1 ?? "rgba(40,46,51,.95)");
+    gradient.addColorStop(1, c2 ?? "rgba(29,30,34,.95)");
     ctx.fillStyle = gradient;
     // stroke
     ctx.lineWidth = 1;
     ctx.strokeStyle = "#494C52";
     // shadow
-    ctx.shadowColor = "rgba(0,0,0,.5)";
-    ctx.shadowBlur = 25;
-    ctx.shadowOffsetX = 2.5;
-    ctx.shadowOffsetY = 12.5;
+    // ctx.shadowColor = "rgba(0,0,0,.5)";
+    // ctx.shadowBlur = 25;
+    // ctx.shadowOffsetX = 2.5;
+    // ctx.shadowOffsetY = 12.5;
     ctx.beginPath();
     ctx.roundRect(x, y, w, h, r);
     ctx.stroke();
@@ -218,20 +214,20 @@ function pluginCanvas() {
     // styles/colors
     let fill, stroke;
     if (dead === true){ // destroyed
-      fill = `hsla(${hue},0%,${lum}%,.1)`;
-      stroke = `hsla(${hue},0%,${lum}%,.1)`;
+      fill = `hsla(${hue},0%,${lum}%,.15)`;
+      stroke = `hsla(${hue},0%,${lum}%,.3)`;
     }
     else if (on === true){ // selected
-      fill = `hsla(${hue},${sat}%,${lum}%,.5)`;
-      stroke = `hsla(${hue},${sat}%,${lum}%,.6)`;
+      fill = `hsla(${hue},${sat}%,${lum}%,.75)`;
+      stroke = `hsla(${hue},${sat}%,${lum}%,.9)`;
     }
     else if (curr === true){ // current beat
-      fill = `hsla(${hue},${sat}%,${lum}%,.2)`;
-      stroke = `hsla(${hue},${sat}%,${lum}%,.3)`;
+      fill = `hsla(${hue},${sat}%,${lum}%,.35)`;
+      stroke = `hsla(${hue},${sat}%,${lum}%,.5)`;
     }
     else { // unselected
-      fill = `hsla(${hue},${sat}%,${lum}%,.1)`;
-      stroke = `hsla(${hue},${sat}%,${lum}%,.2)`;
+      fill = `hsla(${hue},${sat}%,${lum}%,.15)`;
+      stroke = `hsla(${hue},${sat}%,${lum}%,.3)`;
     }
 
     // let alpha = on === true ? .85 : .15;
