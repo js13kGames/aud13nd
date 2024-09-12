@@ -30,6 +30,18 @@ function pluginMenu() {
     mousedir = compass[Math.round(deg/45) * 45];
   };
 
+  // static foe to render on the title
+  const foe = {
+    // x/y - set onPaint
+    // d/w/h - all equal
+    d: 20,
+    w: 20,
+    h: 20,
+    particles: [...Array(25).keys()].map(
+      () => game.foes.makeParticle(20)
+    )
+  };
+
   let time = 0;
   const onPaint = ({ tick }) => {
     // keep track of time
@@ -56,6 +68,19 @@ function pluginMenu() {
     }).forEach(
       (pixel) => game.canvas.drawBox({ ...props, ...pixel })
     );
+
+    // update particles
+    foe.particles.forEach(particle => {
+      particle.angle += tick * 30;
+      particle.tilt -= tick * 3;
+    });
+
+    // render foe
+    game.foes.drawFoe({
+      x: viewport.w/2,
+      y: viewport.h/2 - 100,
+      ...foe
+    });
 
     drawButton({
       name: "Start",
