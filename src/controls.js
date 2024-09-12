@@ -124,7 +124,7 @@ function pluginControls() {
     game.audio.renderAnalyzers({
       x: x + 5 * 40,
       y: y,
-      w: w - 5 * 40 - 3 * 60 - 5 * 40,
+      w: w - 5 * 40 - 3 * 60 - 6 * 40,
       h: h,
       ...props,
       alpha: 1,
@@ -132,7 +132,7 @@ function pluginControls() {
 
     drawSlider({
       label: "LEAD",
-      x: x + w - 3 * 60 - 5 * 40,
+      x: x + w - 3 * 60 - 6 * 40,
       y: y,
       w: 40,
       h: h,
@@ -141,6 +141,19 @@ function pluginControls() {
       min: 0.00001,
       max: 1,
       onChange: (v) => setParams("lead", { gain: parseFloat(v) }),
+    });
+
+    drawSlider({
+      label: "BASS",
+      x: x + w - 3 * 60 - 5 * 40,
+      y: y,
+      w: 40,
+      h: h,
+      ...props,
+      value: game.state.bass.params.gain,
+      min: 0.00001,
+      max: 1,
+      onChange: (v) => setParams("bass", { gain: parseFloat(v) }),
     });
 
     drawSlider({

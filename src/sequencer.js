@@ -20,7 +20,7 @@ function pluginSequencer() {
       return;
     }
     scheduleSounds(game.state.lead, game.audio.playLead);
-    // scheduleSounds(game.state.bass, game.audio.playBass);
+    scheduleSounds(game.state.bass, game.audio.playBass);
     scheduleSounds(game.state.kick, game.audio.playKick);
     scheduleSounds(game.state.snare, game.audio.playSnare);
     scheduleSounds(game.state.hat, game.audio.playHat);
@@ -272,7 +272,7 @@ function pluginSequencer() {
   const defaults = {
     lead: {
       gain: 0.5,
-      wave: "sawtooth",
+      wave: "sine",
       attack: 0.25,
       decay: 0.25,
       sustain: 0.8,
@@ -280,6 +280,11 @@ function pluginSequencer() {
     },
     bass: {
       gain: 0.5,
+      wave: "sawtooth",
+      attack: 0.1,
+      decay: 0.25,
+      sustain: 0.8,
+      release: 0.75,
     },
     kick: {
       gain: 0.5,
