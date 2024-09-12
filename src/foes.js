@@ -127,10 +127,10 @@ function pluginFoes() {
     ctx.arc(x, y, w, 0, 2 * Math.PI, false);
     // ctx.fillStyle = `hsla(42,100%,50%,.85)`;
     const gradient = ctx.createRadialGradient(x, y, 0, x, y, w);
-    gradient.addColorStop(0, "hsla(19,100%,50%,1)");
-    gradient.addColorStop(0.6, "hsla(0,100%,50%,0)");
+    gradient.addColorStop(0, "hsla(0,0%,0%,1)");
+    gradient.addColorStop(0.75, "hsla(0,0%,0%,0)");
     ctx.fillStyle = gradient;
-    // ctx.fill();
+    ctx.fill();
     // ctx.lineWidth = 3;
     // ctx.strokeStyle = `hsla(27,100%,50%,.85)`;
     // ctx.stroke();
