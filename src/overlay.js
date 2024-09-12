@@ -68,10 +68,16 @@ function pluginOverlay() {
 
   game.on("sequencer_unlocked", () => {
     game.set("overlayVisible", true);
-    title = "Sequencer Unlocked";
-    messages = [];
-    buttonText = "Main Menu";
-    onChange = () => game.scene.set("mainmenu");
+    game.set("unlocked", true);
+    title = "Amazing Work!";
+    messages = [
+      "You unlocked the sequencer!",
+      "Have fun making music..."
+    ];
+    buttonText = "Play Sequencer";
+    onChange = () => {
+      game.scene.set("sequencer");
+    }
   });
 
   const render = () => {

@@ -19,8 +19,8 @@ const game = new Gloop();
 game.plugin(debug);
 game.plugin(localStore, {
   name: "AUD13ND",
-  keys: ["resume", "highscore", "totalscore"],
-  initial: { resume: "", highscore: 0, totalscore: 0 },
+  keys: ["resume", "highscore", "totalscore", "unlocked"],
+  initial: { resume: "", highscore: 0, totalscore: 0, unlocked: false },
 });
 game.plugin(pauseWhenHidden);
 game.plugin(scene);

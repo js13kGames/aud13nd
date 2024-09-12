@@ -131,9 +131,6 @@ function pluginFoes() {
     gradient.addColorStop(0.75, "hsla(0,0%,0%,0)");
     ctx.fillStyle = gradient;
     ctx.fill();
-    // ctx.lineWidth = 3;
-    // ctx.strokeStyle = `hsla(27,100%,50%,.85)`;
-    // ctx.stroke();
     // draw each particle orbiting core
     foe.particles.forEach((particle) => {
       particle.x = x;
@@ -189,7 +186,8 @@ function pluginFoes() {
       });
       foes = [];
       game.set("levelscore", score);
-      game.emit("level_completed");
+      const won = (game.state.scene === "Level 13");
+      game.emit(won ? "sequencer_unlocked" : "level_completed");
       return;
     }
     // apply motion

@@ -117,7 +117,7 @@ function pluginMenu() {
       });
     }
     // reward to just play with the sequencer
-    if (highscore >= 10000) {
+    if (unlocked === true) {
       drawButton({
         name: "Sequencer",
         x: viewport.w / 2 - 100,
