@@ -65,12 +65,12 @@ game.scene.create("Level 1", () => {
   game.set("nextLevel", "Level 2");
   game.seq.setup();
   game.foes.setup({
-    intro: 2,
+    intro: 4,
     delay: 2,
     hold: 2,
     limit: 1,
-    speed: 100,
-    countdown: 20,
+    speed: 110,
+    countdown: 10,
   });
 
   game.seq.loadSong("lead", songs.twinkle, {
@@ -80,11 +80,6 @@ game.scene.create("Level 1", () => {
     sustain: 0.9,
     release: 0.25,
   });
-
-  // game.seq.loadSong("kick",`
-  //   E3/4 E3/4 E3/4 E3/4
-  //   E3/4 E3/4 E3/4 E3/4
-  // `);
 
   // scene teardown
   return () => {
@@ -101,13 +96,11 @@ game.scene.create("Level 2", () => {
     delay: 2,
     hold: 2,
     limit: 1,
-    speed: 100,
-    countdown: 30,
+    speed: 120,
+    countdown: 20,
   });
   game.seq.loadSong("lead", songs.cmajor, {
-    // waveform
     wave: "sine",
-    // envelope
     attack: 0.1,
     decay: 0.1,
     sustain: 0.9,
@@ -128,13 +121,11 @@ game.scene.create("Level 3", () => {
     delay: 2,
     hold: 2,
     limit: 2,
-    speed: 150,
-    countdown: 45,
+    speed: 120,
+    countdown: 30,
   });
   game.seq.loadSong("lead", songs.cmajor, {
-    // waveform
     wave: "square",
-    // envelope
     attack: 0.1,
     decay: 0.1,
     sustain: 0.9,
@@ -151,26 +142,20 @@ game.scene.create("Level 4", () => {
   game.set("nextLevel", "Level 5");
   game.seq.setup();
   game.foes.setup({
-    intro: 20,
+    intro: 4,
     delay: 2,
     hold: 2,
     limit: 2,
-    speed: 150,
-    countdown: 45,
+    speed: 130,
+    countdown: 40,
   });
   game.seq.loadSong("lead", songs.mario, {
-    // waveform
     wave: "square",
-    // envelope
     attack: 0.1,
     decay: 0.1,
     sustain: 0.9,
     release: 0.25,
   });
-  // game.seq.loadSong("kick",`
-  //   E3/4 E3/4 E3/4 E3/4
-  //   E3/4 E3/4 E3/4 E3/4
-  // `);
   // scene teardown
   return () => {
     game.seq.teardown();
@@ -181,11 +166,15 @@ game.scene.create("Level 4", () => {
 game.scene.create("Level 5", () => {
   game.set("nextLevel", "Level 6");
   game.seq.setup();
-  game.foes.setup();
-  // game.seq.setParams();
-  // game.seq.setNotes();
-  // game.seq.setBeats();
-  // game.seq.setSelected();
+  game.foes.setup({
+    intro: 4,
+    delay: 2,
+    hold: 2,
+    limit: 2,
+    speed: 140,
+    countdown: 50,
+  });
+
   // scene teardown
   return () => {
     game.seq.teardown();
@@ -196,11 +185,15 @@ game.scene.create("Level 5", () => {
 game.scene.create("Level 6", () => {
   game.set("nextLevel", "Level 7");
   game.seq.setup();
-  game.foes.setup();
-  // game.seq.setParams();
-  // game.seq.setNotes();
-  // game.seq.setBeats();
-  // game.seq.setSelected();
+  game.foes.setup({
+    intro: 4,
+    delay: 2,
+    hold: 2,
+    limit: 3,
+    speed: 140,
+    countdown: 60,
+  });
+
   // scene teardown
   return () => {
     game.seq.teardown();
@@ -211,11 +204,15 @@ game.scene.create("Level 6", () => {
 game.scene.create("Level 7", () => {
   game.set("nextLevel", "Level 8");
   game.seq.setup();
-  game.foes.setup();
-  // game.seq.setParams();
-  // game.seq.setNotes();
-  // game.seq.setBeats();
-  // game.seq.setSelected();
+  game.foes.setup({
+    intro: 4,
+    delay: 2,
+    hold: 2,
+    limit: 3,
+    speed: 150,
+    countdown: 70,
+  });
+
   // scene teardown
   return () => {
     game.seq.teardown();
@@ -226,11 +223,15 @@ game.scene.create("Level 7", () => {
 game.scene.create("Level 8", () => {
   game.set("nextLevel", "Level 9");
   game.seq.setup();
-  game.foes.setup();
-  // game.seq.setParams();
-  // game.seq.setNotes();
-  // game.seq.setBeats();
-  // game.seq.setSelected();
+  game.foes.setup({
+    intro: 4,
+    delay: 2,
+    hold: 2,
+    limit: 3,
+    speed: 150,
+    countdown: 80,
+  });
+
   // scene teardown
   return () => {
     game.seq.teardown();
@@ -241,11 +242,15 @@ game.scene.create("Level 8", () => {
 game.scene.create("Level 9", () => {
   game.set("nextLevel", "Level 10");
   game.seq.setup();
-  game.foes.setup();
-  // game.seq.setParams();
-  // game.seq.setNotes();
-  // game.seq.setBeats();
-  // game.seq.setSelected();
+  game.foes.setup({
+    intro: 4,
+    delay: 2,
+    hold: 2,
+    limit: 4,
+    speed: 150,
+    countdown: 90,
+  });
+
   // scene teardown
   return () => {
     game.seq.teardown();
@@ -256,11 +261,15 @@ game.scene.create("Level 9", () => {
 game.scene.create("Level 10", () => {
   game.set("nextLevel", "Level 11");
   game.seq.setup();
-  game.foes.setup();
-  // game.seq.setParams();
-  // game.seq.setNotes();
-  // game.seq.setBeats();
-  // game.seq.setSelected();
+  game.foes.setup({
+    intro: 4,
+    delay: 2,
+    hold: 2,
+    limit: 4,
+    speed: 160,
+    countdown: 100,
+  });
+
   // scene teardown
   return () => {
     game.seq.teardown();
@@ -271,11 +280,15 @@ game.scene.create("Level 10", () => {
 game.scene.create("Level 11", () => {
   game.set("nextLevel", "Level 12");
   game.seq.setup();
-  game.foes.setup();
-  // game.seq.setParams();
-  // game.seq.setNotes();
-  // game.seq.setBeats();
-  // game.seq.setSelected();
+  game.foes.setup({
+    intro: 4,
+    delay: 2,
+    hold: 2,
+    limit: 5,
+    speed: 160,
+    countdown: 110,
+  });
+
   // scene teardown
   return () => {
     game.seq.teardown();
@@ -286,11 +299,15 @@ game.scene.create("Level 11", () => {
 game.scene.create("Level 12", () => {
   game.set("nextLevel", "Level 13");
   game.seq.setup();
-  game.foes.setup();
-  // game.seq.setParams();
-  // game.seq.setNotes();
-  // game.seq.setBeats();
-  // game.seq.setSelected();
+  game.foes.setup({
+    intro: 4,
+    delay: 2,
+    hold: 2,
+    limit: 5,
+    speed: 160,
+    countdown: 120,
+  });
+
   // scene teardown
   return () => {
     game.seq.teardown();
@@ -300,11 +317,16 @@ game.scene.create("Level 12", () => {
 
 game.scene.create("Level 13", () => {
   game.seq.setup();
-  game.foes.setup();
-  // game.seq.setParams();
-  // game.seq.setNotes();
-  // game.seq.setBeats();
-  // game.seq.setSelected();
+  game.foes.setup({
+    intro: 4,
+    delay: 2,
+    hold: 2,
+    limit: 5,
+    speed: 600,
+    countdown: 130,
+  });
+  game.seq.loadSong("lead","C/16 C#/16 D/16 D#/16 E/16 F/16 F#/16 G/16 G#/16 A/16 A#/16 B/16 F/16 G/16 A/16 C/16");
+  game.seq.loadSong("kick","G3/8 G3/8 G3/8 G3/8 G3/8 G3/8 G3/8 G3/8");
   // scene teardown
   return () => {
     game.seq.teardown();
