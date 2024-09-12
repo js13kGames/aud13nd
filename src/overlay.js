@@ -86,23 +86,28 @@ function pluginOverlay (){
       const { ctx, drawButton } = game.canvas;
       const { viewport } = game.state;
       // layout dimensions
-      const x = viewport.w/4;
-      const y = viewport.h/4;
-      const w = viewport.w/2;
-      const h = viewport.h/2;
+      const w = 500;
+      const h = 400;
+      const x = viewport.w/2 - w/2;
+      const y = viewport.h/2 - h/2;
       // gradient fill
-      const gradient = ctx.createLinearGradient(x+w/2, y, x+w/2, h);
+      ctx.globalAlpha = 1;
+      const gradient = ctx.createLinearGradient(x, y, w, h);
       gradient.addColorStop(0, "rgba(21,23,27,.75)");
-      gradient.addColorStop(1, "rgba(29,30,34,.95)");
+      gradient.addColorStop(1, "rgba(29,30,34,.75)");
       ctx.fillStyle = gradient;
       // shadow
       ctx.shadowColor = "rgba(0,0,0,.75)";
-      ctx.shadowBlur = 15;
+      ctx.shadowBlur = 25;
       ctx.shadowOffsetX = 0;
       ctx.shadowOffsetY = 12.5;
       ctx.beginPath();
       ctx.roundRect(x, y, w, h, 25);
       ctx.fill();
+      ctx.shadowColor = null;
+      ctx.shadowBlur = null;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
       // title text
       ctx.fillStyle = `rgba(255,255,255,.75)`;
       ctx.textBaseline = "middle";
