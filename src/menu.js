@@ -51,7 +51,7 @@ function pluginMenu() {
     clear();
 
     // render each pixel of the title
-    getTitlePixels({
+    const pixels = getTitlePixels({
       x: 50,
       y: 50,
       w: viewport.w - 100,
@@ -62,7 +62,8 @@ function pluginMenu() {
       n: Math.floor(time * 10) % 14,
       // change direction based on mouse position
       dir: mousedir,
-    }).forEach((pixel) => game.canvas.drawBox({ ...props, ...pixel }));
+    });
+    pixels.forEach((pixel) => game.canvas.drawBox({ ...props, ...pixel }));
 
     // update particles
     foe.particles.forEach((particle) => {
@@ -70,10 +71,13 @@ function pluginMenu() {
       particle.tilt -= tick * 3;
     });
 
+    // take the bottom of last pixel to figure out particle position
+    const lastPixel = pixels[pixels.length-1];
+
     // render foe
     game.foes.drawFoe({
       x: viewport.w / 2,
-      y: viewport.h / 2 - 100,
+      y: lastPixel.y + (viewport.h / 2 - lastPixel.y + lastPixel.h) / 2,
       ...foe,
     });
 
