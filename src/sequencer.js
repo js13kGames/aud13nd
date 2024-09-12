@@ -3,11 +3,11 @@ import parseSong from "./Gloop/util/audio/parse/song";
 function pluginSequencer() {
   const game = this;
 
-  const instruments = ["lead","bass","kick","snare","hat"];
+  const instruments = ["lead", "bass", "kick", "snare", "hat"];
 
   const onStart = () => {
     // reset each instrument timing
-    instruments.forEach(key => {
+    instruments.forEach((key) => {
       const instrument = game.state[key];
       instrument.time = game.audio.ctx.currentTime;
       instrument.next = -1;
@@ -35,10 +35,10 @@ function pluginSequencer() {
     while (time <= currentTime + LOOKAHEAD) {
       // next starts at -1
       const n = next % cols.length;
-      const duration = next < 0 ? .5 : cols[n] * (60 / tempo);
+      const duration = next < 0 ? 0.5 : cols[n] * (60 / tempo);
       const tones = next < 0 ? [0] : rows[notes[n]];
       // only make sound when column is not destroyed
-      if (next > -1 && killed.has(n) !== true){
+      if (next > -1 && killed.has(n) !== true) {
         tones?.forEach((frequency) => {
           play(time, frequency, duration, params);
         });
@@ -65,7 +65,7 @@ function pluginSequencer() {
     // clear the canvas
     clear();
 
-    const { padding=100 } = layout;
+    const { padding = 100 } = layout;
 
     game.audio.renderAnalyzers({
       x: 0,
@@ -73,7 +73,7 @@ function pluginSequencer() {
       ...viewport,
       ...props,
       s: 2,
-      alpha: .75
+      alpha: 0.75,
     });
 
     // draw bounding box
@@ -85,9 +85,9 @@ function pluginSequencer() {
       p: 100,
       r: 25,
     });
-    if ( layout.stats !== false){
+    if (layout.stats !== false) {
       renderStats({
-        x: viewport.w/2,
+        x: viewport.w / 2,
         y: container.y + container.h - 60,
         w: container.w,
         h: 50,
@@ -96,18 +96,17 @@ function pluginSequencer() {
     }
 
     const ctrlHeight = 120 + padding + padding;
-    const controls = (
-      layout.controls !== true ?
-      { x:0, y:0, w:0, h:0 } :
-      game.controls.render({
-        x: container.x,
-        y: container.y + container.h - ctrlHeight,
-        w: container.w,
-        h: ctrlHeight,
-        p: padding,
-        props
-      })
-    );
+    const controls =
+      layout.controls !== true
+        ? { x: 0, y: 0, w: 0, h: 0 }
+        : game.controls.render({
+            x: container.x,
+            y: container.y + container.h - ctrlHeight,
+            w: container.w,
+            h: ctrlHeight,
+            p: padding,
+            props,
+          });
 
     // reset grid cells
     cells = game.seq.cells = [];
@@ -115,7 +114,7 @@ function pluginSequencer() {
     // figure out the ideal row height based on all defined instruments
     let totalRows = 0;
     let totalGaps = 0;
-    instruments.forEach(key => {
+    instruments.forEach((key) => {
       const { rows } = game.state[key];
       totalRows += rows.length;
       totalGaps += rows.length ? padding : 0;
@@ -126,14 +125,14 @@ function pluginSequencer() {
     let offsetY = container.y + padding;
     let height = 0;
     // layout each instrument
-    instruments.forEach(key => {
+    instruments.forEach((key) => {
       height = rowHeight * game.state[key].rows.length;
       renderInstrumentGrid(key, {
         x: container.x,
         y: offsetY,
         w: container.w,
         h: height,
-        p: padding
+        p: padding,
       });
       offsetY += height ? height + padding : 0;
     });
@@ -154,14 +153,14 @@ function pluginSequencer() {
     ctx.textRendering = "optimizeLegibility";
     const { scene, totalscore, levelscore, countdown } = game.state;
     const score = totalscore + levelscore;
-    const stats = [scene, `Time ${Math.round(countdown)}`, `Score ${score}` ];
+    const stats = [scene, `Time ${Math.round(countdown)}`, `Score ${score}`];
     ctx.fillText(stats.join(" • "), x, y, w);
   };
 
   // render the layout grid of a single instrument
   const renderInstrumentGrid = (key, { x, y, w, h, p }) => {
     // early exit when not visible
-    if (h === 0){
+    if (h === 0) {
       return;
     }
     // offset horizontal dimensions by padding
@@ -200,7 +199,7 @@ function pluginSequencer() {
           ...props,
           on: false,
           dead: killed.has(col),
-          curr: beat === col
+          curr: beat === col,
         };
         // track for clicks and collisions
         cells.push(cell);
@@ -216,23 +215,23 @@ function pluginSequencer() {
   };
 
   // set up notes and beats for an instrument [key]
-  const loadSong = (key, song, params={}) => {
+  const loadSong = (key, song, params = {}) => {
     let duration = 0;
     let cols = [];
     let rows = [];
     let lookup = {};
     let notes = [];
     // everything empty unless the song exists
-    if (song){
+    if (song) {
       // split and parse each not of the song
       parseSong(song).forEach(({ count, tones, input }) => {
         // notes converted to count of beats
         cols.push(count);
         duration += count;
         // strip duration off the input, for lookup
-        const note = input.replace(/(?:\*\d+)?(?:\/\d+)?\.*$/g,"");
+        const note = input.replace(/(?:\*\d+)?(?:\/\d+)?\.*$/g, "");
         // not in lookup yet
-        if (lookup[note] == null){
+        if (lookup[note] == null) {
           lookup[note] = rows.push(tones) - 1;
         }
         notes.push(lookup[note]);
@@ -257,7 +256,7 @@ function pluginSequencer() {
       // keep track of which cols have been hit
       killed: new Map(),
       // optional audio parameters
-      params: { ...defaults[key], ...params }
+      params: { ...defaults[key], ...params },
     });
   };
 
@@ -290,7 +289,7 @@ function pluginSequencer() {
     },
     hat: {
       gain: 0.5,
-    }
+    },
   };
 
   // final controls
@@ -307,7 +306,7 @@ function pluginSequencer() {
   const onCollision = ({ key, col }) => {
     const { cols, killed } = game.state[key];
     killed.set(col, true);
-    if (killed.size >= cols.length){
+    if (killed.size >= cols.length) {
       // level failed
       game.pause();
       game.emit("level_failed");
@@ -315,22 +314,22 @@ function pluginSequencer() {
   };
 
   // score bonus points for instrument columns not destroyed
-  const getBonusCount = (key="lead") => {
+  const getBonusCount = (key = "lead") => {
     const { cols, killed } = game.state[key];
     return cols.length - killed.size;
   };
 
-  const getRandomRow = (key="lead") => {
+  const getRandomRow = (key = "lead") => {
     const { notes, killed } = game.state[key];
     let row = null;
     do {
       // target selected to prevent overloading only few rows
       const col = Math.floor(game.random(notes.length));
       // skip if the col is destroyed
-      if (killed.has(col) !== true){
+      if (killed.has(col) !== true) {
         row = notes[col];
       }
-    // until a valid row is found
+      // until a valid row is found
     } while (row == null);
     return row;
   };
@@ -347,11 +346,11 @@ function pluginSequencer() {
       game.on("loop_paint", onPaint);
       game.on("foe_collision", onCollision);
       // initialize instruments
-      loadSong("lead","C D E F G A B C");
-      loadSong("bass","");
-      loadSong("kick","");
-      loadSong("snare","");
-      loadSong("hat","");
+      loadSong("lead", "C D E F G A B C");
+      loadSong("bass", "");
+      loadSong("kick", "");
+      loadSong("snare", "");
+      loadSong("hat", "");
     },
     teardown: () => {
       // unbind game event handlers
@@ -365,7 +364,7 @@ function pluginSequencer() {
     cells,
     getRandomRow,
     getBonusCount,
-    loadSong
+    loadSong,
   };
 }
 

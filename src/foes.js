@@ -1,4 +1,3 @@
-
 function pluginFoes() {
   const game = this;
 
@@ -12,9 +11,9 @@ function pluginFoes() {
   const scaleFactor = () => {
     const { cells } = game.seq;
     const first = cells[0];
-    const last = cells[cells.length-1];
+    const last = cells[cells.length - 1];
     const delta = last.x + last.w - first.x;
-    return delta/WIDTH;
+    return delta / WIDTH;
   };
 
   // spawn new foes to attack selected beats
@@ -24,12 +23,12 @@ function pluginFoes() {
   let delay = null;
   const shouldSpawn = (tick) => {
     // limit concurrent foes
-    if (foes.length >= config.limit){
+    if (foes.length >= config.limit) {
       return;
     }
     delay = delay ?? config.intro;
     // check delay to next spawn
-    if (delay > 0){
+    if (delay > 0) {
       delay -= tick;
       return; // don't spawn
     }
@@ -52,9 +51,7 @@ function pluginFoes() {
       // hold in spawn position before moving
       hold: config.hold,
       // animated particles for effects
-      particles: [...Array(25).keys()].map(
-        () => makeParticle(diameter)
-      )
+      particles: [...Array(25).keys()].map(() => makeParticle(diameter)),
     };
     foes.push(foe);
     // emit event for sound/fx
@@ -71,37 +68,37 @@ function pluginFoes() {
     // tilt - will be the rotation angle of the whole ellipse
     // angle - will be animated around the shape over time
     // t - how long the sparks survive after collision
-    const w = random(d*2, d/2);
-    const h = random(d, d/2);
+    const w = random(d * 2, d / 2);
+    const h = random(d, d / 2);
     const tilt = random(Math.PI, -Math.PI);
     const angle = random(Math.PI, -Math.PI);
-    const hue = random(300,390);
-    const t = .75;
+    const hue = random(300, 390);
+    const t = 0.75;
     return { w, h, tilt, angle, t, hue };
-  }
+  };
 
   const checkCollisions = (foe) => {
     const { cells } = game.seq;
     // get real horiz position
     const pos = getPosition(foe);
     // check against each cell of that foe's row
-    for (let i = 0; i < cells.length; i++){
+    for (let i = 0; i < cells.length; i++) {
       const target = cells[i];
       // make sure target cell is selected and in the right row
-      if (target.on !== true || target.row != foe.row){
+      if (target.on !== true || target.row != foe.row) {
         continue; // skip
       }
-      const left = Math.max(target.x, pos.x - pos.w/2);
-      const right = Math.min( target.x + target.w, pos.x + pos.w/2 );
+      const left = Math.max(target.x, pos.x - pos.w / 2);
+      const right = Math.min(target.x + target.w, pos.x + pos.w / 2);
       // check for overlap
-      if (right - left > 0){
+      if (right - left > 0) {
         // store collision data
         foe.collision = {
           key: foe.key,
           row: target.row,
           col: target.col,
           x: pos.x,
-          y: pos.y
+          y: pos.y,
         };
       }
     }
@@ -115,11 +112,11 @@ function pluginFoes() {
     // select the correct left/right cell to start from
     const start = cells[row];
     // real vertical position based on current row
-    const y = start.y + start.h/2;
+    const y = start.y + start.h / 2;
     // real current position, scaled and offset
     const x = start.x + rx * sf;
     return { x, y, w: d, h: d };
-  }
+  };
 
   const drawFoe = (foe) => {
     const { ctx } = game.canvas;
@@ -131,14 +128,14 @@ function pluginFoes() {
     // ctx.fillStyle = `hsla(42,100%,50%,.85)`;
     const gradient = ctx.createRadialGradient(x, y, 0, x, y, w);
     gradient.addColorStop(0, "hsla(19,100%,50%,1)");
-    gradient.addColorStop(.6, "hsla(0,100%,50%,0)");
+    gradient.addColorStop(0.6, "hsla(0,100%,50%,0)");
     ctx.fillStyle = gradient;
     ctx.fill();
     // ctx.lineWidth = 3;
     // ctx.strokeStyle = `hsla(27,100%,50%,.85)`;
     // ctx.stroke();
     // draw each particle orbiting core
-    foe.particles.forEach(particle => {
+    foe.particles.forEach((particle) => {
       particle.x = x;
       particle.y = y;
       drawParticle(particle);
@@ -156,14 +153,14 @@ function pluginFoes() {
 
   const onLogic = ({ tick }) => {
     // update every foe particle
-    foes.forEach(foe => {
-      foe.particles.forEach(particle => {
+    foes.forEach((foe) => {
+      foe.particles.forEach((particle) => {
         particle.angle += tick * 30;
         particle.tilt -= tick * 3;
       });
     });
     // update every spark particle
-    sparks = sparks.flatMap(spark => {
+    sparks = sparks.flatMap((spark) => {
       // rotate
       spark.angle += tick * 30;
       spark.tilt -= tick * 3;
@@ -176,17 +173,17 @@ function pluginFoes() {
       return spark.t > 0 ? spark : [];
     });
     // don't do anything else while paused
-    if (game.state.paused){
+    if (game.state.paused) {
       return;
     }
     // decrement the countdown without emitting events
     game.state.countdown -= tick;
     // check for completion
-    if (game.state.countdown <= 0){
+    if (game.state.countdown <= 0) {
       game.pause();
       // expire remaining foes
       let score = game.state.levelscore;
-      foes.forEach(foe => {
+      foes.forEach((foe) => {
         sparks.push(...foe.particles);
         score += 100;
       });
@@ -196,24 +193,23 @@ function pluginFoes() {
       return;
     }
     // apply motion
-    foes = foes.flatMap(foe => {
+    foes = foes.flatMap((foe) => {
       // check collisions
       checkCollisions(foe);
       // handle impact
-      if (foe.collision){
+      if (foe.collision) {
         game.emit("foe_collision", foe.collision);
         // move the particles to sparks array to track explosion
         sparks.push(...foe.particles);
         return []; // remove it
       }
-      if (foe.hold > 0){
+      if (foe.hold > 0) {
         foe.hold -= tick;
-      }
-      else {
+      } else {
         foe.rx += foe.v * tick;
       }
       // has the foe passed thru the entire row
-      if (foe.v > 0 ? foe.rx > RIGHT : foe.rx < LEFT){
+      if (foe.v > 0 ? foe.rx > RIGHT : foe.rx < LEFT) {
         // emit event for sound/fx
         game.emit("foe_expire", foe);
         let score = game.state.levelscore;
@@ -224,7 +220,7 @@ function pluginFoes() {
     });
     // check for spawn
     shouldSpawn(tick);
-  }
+  };
 
   const onPaint = () => {
     // draw every foe
@@ -233,7 +229,7 @@ function pluginFoes() {
     sparks.forEach(drawParticle);
     // do last, so overlays are top layer
     game.overlay.render();
-  }
+  };
 
   let config = {
     // sec to play before spawns
@@ -269,8 +265,8 @@ function pluginFoes() {
     setup,
     teardown,
     drawFoe,
-    makeParticle
+    makeParticle,
   };
-};
+}
 
 export default pluginFoes;

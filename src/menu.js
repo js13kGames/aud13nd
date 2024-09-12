@@ -1,4 +1,3 @@
-
 function pluginMenu() {
   const game = this;
 
@@ -12,22 +11,22 @@ function pluginMenu() {
     "-135": "NW",
     "-90": "N",
     "-45": "NE",
-    "0": "E",
-    "45": "SE",
-    "90": "S",
-    "135": "SW",
-    "180": "W"
-  }
+    0: "E",
+    45: "SE",
+    90: "S",
+    135: "SW",
+    180: "W",
+  };
   // change sampling direction based on mouse position
   const onMousemove = (ev) => {
     const { viewport } = game.state;
     // get offsets from title center
-    const dx = ev.offsetX - viewport.w/2;
-    const dy = ev.offsetY - viewport.h/3;
+    const dx = ev.offsetX - viewport.w / 2;
+    const dy = ev.offsetY - viewport.h / 3;
     // convert offsets to degrees
     const deg = Math.atan2(dy, dx) * (180 / Math.PI);
     // round to 45 degrees and convert to compass direction
-    mousedir = compass[Math.round(deg/45) * 45];
+    mousedir = compass[Math.round(deg / 45) * 45];
   };
 
   // static foe to render on the title
@@ -37,9 +36,7 @@ function pluginMenu() {
     d: 20,
     w: 20,
     h: 20,
-    particles: [...Array(25).keys()].map(
-      () => game.foes.makeParticle(20)
-    )
+    particles: [...Array(25).keys()].map(() => game.foes.makeParticle(20)),
   };
 
   let time = 0;
@@ -64,28 +61,26 @@ function pluginMenu() {
       // rotate the samples to create motion effect
       n: Math.floor(time * 10) % 14,
       // change direction based on mouse position
-      dir: mousedir
-    }).forEach(
-      (pixel) => game.canvas.drawBox({ ...props, ...pixel })
-    );
+      dir: mousedir,
+    }).forEach((pixel) => game.canvas.drawBox({ ...props, ...pixel }));
 
     // update particles
-    foe.particles.forEach(particle => {
+    foe.particles.forEach((particle) => {
       particle.angle += tick * 30;
       particle.tilt -= tick * 3;
     });
 
     // render foe
     game.foes.drawFoe({
-      x: viewport.w/2,
-      y: viewport.h/2 - 100,
-      ...foe
+      x: viewport.w / 2,
+      y: viewport.h / 2 - 100,
+      ...foe,
     });
 
     drawButton({
       name: "Start",
-      x: viewport.w/2 - 100,
-      y: viewport.h/2,
+      x: viewport.w / 2 - 100,
+      y: viewport.h / 2,
       w: 200,
       h: 60,
       f: 16,
@@ -101,11 +96,11 @@ function pluginMenu() {
     });
 
     // option to resume from previous completed level
-    if (resume){
+    if (resume) {
       drawButton({
         name: "Resume",
-        x: viewport.w/2 - 100,
-        y: viewport.h/2 + 60,
+        x: viewport.w / 2 - 100,
+        y: viewport.h / 2 + 60,
         w: 200,
         h: 60,
         f: 16,
@@ -118,11 +113,11 @@ function pluginMenu() {
       });
     }
     // reward to just play with the sequencer
-    if (highscore >= 10000){
+    if (highscore >= 10000) {
       drawButton({
         name: "Sequencer",
-        x: viewport.w/2 - 100,
-        y: viewport.h/2 + 60 + 60,
+        x: viewport.w / 2 - 100,
+        y: viewport.h / 2 + 60 + 60,
         w: 200,
         h: 60,
         f: 16,
@@ -134,23 +129,23 @@ function pluginMenu() {
         },
       });
     }
-    if (highscore > 0){
+    if (highscore > 0) {
       drawLabel({
         value: `Highscore ${highscore}`,
-        x: viewport.w/2,
-        y: viewport.h/2 + 60 + 60 + 60 + 20,
+        x: viewport.w / 2,
+        y: viewport.h / 2 + 60 + 60 + 60 + 20,
         w: 200,
-        f: 16
+        f: 16,
       });
     }
   };
 
   // render text offscreen and return sampled pixel/particles
   const memo = new Map();
-  const getTitlePixels = (opts={}) => {
+  const getTitlePixels = (opts = {}) => {
     const key = JSON.stringify(opts);
-    if (!memo.has(key)){
-      const { w, h, x: sx, y:sy, spacing, n, dir } = opts;
+    if (!memo.has(key)) {
+      const { w, h, x: sx, y: sy, spacing, n, dir } = opts;
       const txt1 = "AUD  ND";
       const txt2 = "   13  ";
       const size = 190;
@@ -163,13 +158,13 @@ function pluginMenu() {
       ctx.letterSpacing = "14px";
       ctx.lineWidth = 8;
       ctx.fillStyle = `#000000`;
-      ctx.fillText(txt1, w/2, h/3, w);
+      ctx.fillText(txt1, w / 2, h / 3, w);
       ctx.strokeStyle = "#000000";
-      ctx.strokeText(txt1, w/2, h/3, w);
+      ctx.strokeText(txt1, w / 2, h / 3, w);
       ctx.fillStyle = `#FF0000`;
-      ctx.fillText(txt2, w/2, h/3, w);
+      ctx.fillText(txt2, w / 2, h / 3, w);
       ctx.strokeStyle = "#FF0000";
-      ctx.strokeText(txt2, w/2, h/3, w);
+      ctx.strokeText(txt2, w / 2, h / 3, w);
       let particles = [];
       // modify the sampled x/y pixels based on direction
       const mx = /W/.test(dir) ? spacing - n - 1 : /E/.test(dir) ? n : 0;
@@ -182,16 +177,16 @@ function pluginMenu() {
         const x = Math.floor((i % w4) / 4);
         const y = Math.floor(i / w4);
         // only include sampled pixels
-        if (x % spacing === mx && y % spacing === my){
+        if (x % spacing === mx && y % spacing === my) {
           // title pixel has alpha
-          if (data[i + 3] > 0){
+          if (data[i + 3] > 0) {
             particles.push({
               x: sx + x,
               y: sy + y,
               w: spacing,
               h: spacing,
               // red pixels are "on"
-              on: data[i + 0] > 0
+              on: data[i + 0] > 0,
             });
           }
         }
@@ -214,7 +209,7 @@ function pluginMenu() {
 
   return {
     name: "menu",
-    setup
+    setup,
   };
 }
 

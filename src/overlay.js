@@ -1,7 +1,5 @@
-
-
 // show informational overlay message
-function pluginOverlay (){
+function pluginOverlay() {
   const game = this;
   let title = null;
   let messages = [];
@@ -16,21 +14,20 @@ function pluginOverlay (){
   });
 
   game.on("scene_enter", ({ name }) => {
-    if (game.get("newgame") === true){
+    if (game.get("newgame") === true) {
       game.set("overlayVisible", true);
       title = "How to Play";
       messages = [
         "Click or drag around the grid to select",
         "a note (row) for each beat (column). Enjoy",
-        "the sounds and avoid obstacles to survive."
+        "the sounds and avoid obstacles to survive.",
       ];
       buttonText = "Let's Go!";
       onChange = () => {
         game.set("newgame", false);
         game.resume();
-      }
-    }
-    else if (/^Level/.test(name)) {
+      };
+    } else if (/^Level/.test(name)) {
       game.set("overlayVisible", true);
       title = name;
       messages = [];
@@ -57,14 +54,10 @@ function pluginOverlay (){
     game.set("totalscore", score);
     game.set("levelscore", 0);
     title = `${scene} Complete`;
-    messages = [
-      `Level +${levelscore}`,
-      `Bonus +${bonus}`,
-      `Total ${score}`
-    ];
+    messages = [`Level +${levelscore}`, `Bonus +${bonus}`, `Total ${score}`];
 
     // update high score
-    if (score > highscore){
+    if (score > highscore) {
       messages.push("New High Score!");
       game.set("highscore", score);
     }
@@ -82,14 +75,14 @@ function pluginOverlay (){
   });
 
   const render = () => {
-    if (game.get("overlayVisible") === true){
+    if (game.get("overlayVisible") === true) {
       const { ctx, drawButton } = game.canvas;
       const { viewport } = game.state;
       // layout dimensions
       const w = 500;
       const h = 400;
-      const x = viewport.w/2 - w/2;
-      const y = viewport.h/2 - h/2;
+      const x = viewport.w / 2 - w / 2;
+      const y = viewport.h / 2 - h / 2;
       // gradient fill
       ctx.globalAlpha = 1;
       const gradient = ctx.createLinearGradient(x, y, w, h);
@@ -120,7 +113,7 @@ function pluginOverlay (){
       });
       drawButton({
         x: x + w / 2 - 100,
-        y: y + h * 3 / 4,
+        y: y + (h * 3) / 4,
         w: 200,
         h: 60,
         f: 16,
@@ -134,8 +127,8 @@ function pluginOverlay (){
 
   return {
     name: "overlay",
-    render
-  }
+    render,
+  };
 }
 
 export default pluginOverlay;

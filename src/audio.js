@@ -31,7 +31,7 @@ function pluginAudio() {
     ratio: 20,
     knee: 1,
     attack: 0,
-    release: 0.015
+    release: 0.015,
   });
   // final gain to control volume
   const gainVolume = new GainNode(ctx);
@@ -49,7 +49,7 @@ function pluginAudio() {
     renderAnalyzer(graphKick, { ...opts, hue: 185 });
     renderAnalyzer(graphBass, { ...opts, hue: 330 });
     renderAnalyzer(graphLead, { ...opts, hue: 120 });
-  }
+  };
 
   // draw analyzer graph of the audio stream
   const renderAnalyzer = (node, { x, y, w, h, s, hue, alpha }) => {
@@ -67,7 +67,7 @@ function pluginAudio() {
     for (let dx = 0, i = 0; i < bufferLength; i++) {
       const v = dataArray[i] / 128.0;
       const dy = (v * h) / 2;
-      ctx[i===0 ? "moveTo" : "lineTo"](x + dx, y + dy);
+      ctx[i === 0 ? "moveTo" : "lineTo"](x + dx, y + dy);
       dx += sliceWidth;
     }
     ctx.lineTo(w + x, y + h / 2);
@@ -75,45 +75,51 @@ function pluginAudio() {
   };
 
   // synth lead ~ A4/4
-  const playLead = (start, frequency=440, duration=0.5, params={}) => {
+  const playLead = (start, frequency = 440, duration = 0.5, params = {}) => {
     const { wave, attack, decay, sustain, release } = params;
     // create a tone
     const osc = new OscillatorNode(ctx, {
       type: wave,
-      frequency
+      frequency,
     });
     // shape the tone
     const env = new GainNode(ctx);
     // shape envelope
     env.gain.setValueAtTime(0, start);
-    env.gain.exponentialRampToValueAtTime(1, start + (attack * duration));
-    env.gain.exponentialRampToValueAtTime(sustain, start + (attack * duration) + (decay * duration));
-    env.gain.exponentialRampToValueAtTime(0.00001, start + duration + (release * duration));
+    env.gain.exponentialRampToValueAtTime(1, start + attack * duration);
+    env.gain.exponentialRampToValueAtTime(
+      sustain,
+      start + attack * duration + decay * duration,
+    );
+    env.gain.exponentialRampToValueAtTime(
+      0.00001,
+      start + duration + release * duration,
+    );
     // begin/end tone
     osc.start(start);
-    osc.stop(start + duration + (release * duration));
+    osc.stop(start + duration + release * duration);
     // cleanup
     osc.onended = () => {
       osc.disconnect();
       env.disconnect();
     };
     osc.connect(env).connect(gainLead); // .connect(filter)
-  }
+  };
 
   // drum kick ~ E3/4
-  const playKick = (start, frequency=167.1, duration=0.5, params={}) => {
+  const playKick = (start, frequency = 167.1, duration = 0.5, params = {}) => {
     // create a tone
     const osc = new OscillatorNode(ctx, {
       type: "sine",
-      frequency
+      frequency,
     });
     // shape the envelope
     const env = new GainNode(ctx);
     osc.frequency.setValueAtTime(frequency, start + 0.001);
-    env.gain.linearRampToValueAtTime(1, start + 0.1)
+    env.gain.linearRampToValueAtTime(1, start + 0.1);
     osc.frequency.exponentialRampToValueAtTime(1, start + duration);
     env.gain.exponentialRampToValueAtTime(0.01, start + duration);
-    env.gain.linearRampToValueAtTime(0, start + duration + 0.1)
+    env.gain.linearRampToValueAtTime(0, start + duration + 0.1);
     // begin/end
     osc.start(start);
     osc.stop(start + duration + 0.1);
@@ -127,12 +133,12 @@ function pluginAudio() {
   };
 
   // drum snare ~ G2/8
-  const playSnare = (start, frequency=100, duration=0.25, params={}) => {
+  const playSnare = (start, frequency = 100, duration = 0.25, params = {}) => {
     // noise and filter
     const noise = makeNoiseBuffer();
     const filter = new BiquadFilterNode(ctx, {
-      type: 'highpass',
-      frequency: 1000
+      type: "highpass",
+      frequency: 1000,
     });
     // shape noise envelope
     const envNoise = new GainNode(ctx);
@@ -144,9 +150,9 @@ function pluginAudio() {
     envTone.gain.setValueAtTime(0.7, start);
     envTone.gain.exponentialRampToValueAtTime(0.01, start + duration / 2);
     // begin/end
-    noise.start(start)
+    noise.start(start);
     noise.stop(start + duration);
-    tone.start(start)
+    tone.start(start);
     tone.stop(start + duration);
     // cleanup
     tone.onended = () => {
@@ -204,7 +210,7 @@ function pluginAudio() {
   // };
 
   // drum hat ~ C3/2•
-  const playHat = (start, frequency=130.81, duration=1.5, params={}) => {
+  const playHat = (start, frequency = 130.81, duration = 1.5, params = {}) => {
     // shape the envelope
     const env = new GainNode(ctx);
     env.gain.setValueAtTime(0.00001, start);
@@ -213,21 +219,21 @@ function pluginAudio() {
     env.gain.exponentialRampToValueAtTime(0.00001, start + duration);
     // filters
     const bandpass = new BiquadFilterNode(ctx, {
-      type: 'bandpass',
+      type: "bandpass",
       frequency: 20000,
-      Q: 0.2
+      Q: 0.2,
     });
     const highpass = new BiquadFilterNode(ctx, {
-      type: 'highpass',
-      frequency: 5000
+      type: "highpass",
+      frequency: 5000,
     });
     // wired up
     bandpass.connect(highpass).connect(env).connect(gainHat);
     // layered square waves
-    ([1, 1.3420, 1.2312, 1.6532, 1.9523, 2.1523]).forEach(ratio => {
+    [1, 1.342, 1.2312, 1.6532, 1.9523, 2.1523].forEach((ratio) => {
       const osc = new OscillatorNode(ctx, {
         type: "square",
-        frequency: frequency * ratio
+        frequency: frequency * ratio,
       });
       // begin/end
       osc.start(start);
@@ -246,9 +252,10 @@ function pluginAudio() {
     node.gain.exponentialRampToValueAtTime(value, ctx.currentTime);
   };
 
-  game.on("state_change", ({ key, value, previous })=>{
-    let node = null, num = null;
-    switch (key){
+  game.on("state_change", ({ key, value, previous }) => {
+    let node = null,
+      num = null;
+    switch (key) {
       case "lead":
         node = gainLead;
         num = value?.params?.gain;
@@ -274,18 +281,18 @@ function pluginAudio() {
         num = value;
         break;
     }
-    if (node != null && num != null){
+    if (node != null && num != null) {
       setGain(node, num);
     }
   });
 
-  const playSong = (song="", play=playLead, tempo=120) => {
+  const playSong = (song = "", play = playLead, tempo = 120) => {
     let time = ctx.currentTime;
     parseSong(song).forEach(({ count, tones }) => {
       const duration = count * (60 / tempo);
-      tones.forEach(hz => play(time, hz, duration));
+      tones.forEach((hz) => play(time, hz, duration));
       time += duration;
-    })
+    });
   };
 
   game.on("foe_collision", () => {
@@ -303,8 +310,8 @@ function pluginAudio() {
     playSnare,
     // playClap,
     playHat,
-    renderAnalyzers
-  }
+    renderAnalyzers,
+  };
 }
 
 export default pluginAudio;

@@ -10,7 +10,7 @@ import { minify } from "html-minifier";
 
 function html(opts = {}) {
   if (!opts.include) {
-    opts.include = '**/*.html'
+    opts.include = "**/*.html";
   }
 
   const filter = createFilter(opts.include, opts.exclude);
@@ -20,7 +20,7 @@ function html(opts = {}) {
 
     transform(code, id) {
       if (filter(id)) {
-        const { minifier = {} } = opts
+        const { minifier = {} } = opts;
         if (minifier) {
           code = minify(code, {
             collapseWhitespace: true,
@@ -28,15 +28,15 @@ function html(opts = {}) {
             removeEmptyAttributes: true,
             minifyCSS: true,
             minifyJS: true,
-            ...minifier
-          })
+            ...minifier,
+          });
         }
         return {
           code: `export default ${JSON.stringify(code)};`,
-          map: { mappings: "" }
+          map: { mappings: "" },
         };
       }
-    }
+    },
   };
 }
 

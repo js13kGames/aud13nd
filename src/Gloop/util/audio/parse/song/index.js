@@ -1,6 +1,6 @@
 import parseNote from "../note";
 
-function audioParseSong (input){
+function audioParseSong(input) {
   return input
     .replace(/\|/g, " ")
     .replace(/\s+/g, " ")

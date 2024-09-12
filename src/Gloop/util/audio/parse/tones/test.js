@@ -1,7 +1,6 @@
 import parseTones from "./index";
 
 describe("audio/parse/tones", () => {
-
   test.each([
     ["R", 0],
     ["C-1", 8.175799],
@@ -172,8 +171,7 @@ describe("audio/parse/tones", () => {
     ["A##", 493.8833],
     ["B", 493.8833],
   ])("input '%s' should be %s Hz", (input, hertz) => {
-    const [ tone ] = parseTones(input);
+    const [tone] = parseTones(input);
     expect(tone).toBeCloseTo(hertz);
   });
-
 });

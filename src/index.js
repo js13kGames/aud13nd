@@ -20,7 +20,7 @@ game.plugin(debug);
 game.plugin(localStore, {
   name: "AUD13ND",
   keys: ["resume", "highscore", "totalscore"],
-  initial: { resume: "", highscore: 0, totalscore:0 }
+  initial: { resume: "", highscore: 0, totalscore: 0 },
 });
 game.plugin(pauseWhenHidden);
 game.plugin(scene);
@@ -45,12 +45,12 @@ game.scene.create("sequencer", () => {
     snare: true,
     hat: true,
     stats: false,
-    padding: 50
+    padding: 50,
   });
   game.seq.loadSong("lead", songs.chords);
-  game.seq.loadSong("kick","C7/4 D7/4 E7/4 F7/4 G7/4 A7/4 B7/4");
-  game.seq.loadSong("snare","C7/4 D7/4 E7/4 F7/4 G7/4 A7/4 B7/4");
-  game.seq.loadSong("hat","C7/4 D7/4 E7/4 F7/4 G7/4 A7/4 B7/4");
+  game.seq.loadSong("kick", "C7/4 D7/4 E7/4 F7/4 G7/4 A7/4 B7/4");
+  game.seq.loadSong("snare", "C7/4 D7/4 E7/4 F7/4 G7/4 A7/4 B7/4");
+  game.seq.loadSong("hat", "C7/4 D7/4 E7/4 F7/4 G7/4 A7/4 B7/4");
   // scene teardown
   return () => {
     game.seq.teardown();
@@ -70,7 +70,7 @@ game.scene.create("Level 1", () => {
     hold: 2,
     limit: 1,
     speed: 100,
-    countdown: 20
+    countdown: 20,
   });
 
   game.seq.loadSong("lead", songs.twinkle, {
@@ -102,9 +102,9 @@ game.scene.create("Level 2", () => {
     hold: 2,
     limit: 1,
     speed: 100,
-    countdown: 30
+    countdown: 30,
   });
-  game.seq.loadSong("lead", songs.cmajor,{
+  game.seq.loadSong("lead", songs.cmajor, {
     // waveform
     wave: "sine",
     // envelope
@@ -129,7 +129,7 @@ game.scene.create("Level 3", () => {
     hold: 2,
     limit: 2,
     speed: 150,
-    countdown: 45
+    countdown: 45,
   });
   game.seq.loadSong("lead", songs.cmajor, {
     // waveform
@@ -156,7 +156,7 @@ game.scene.create("Level 4", () => {
     hold: 2,
     limit: 2,
     speed: 150,
-    countdown: 45
+    countdown: 45,
   });
   game.seq.loadSong("lead", songs.mario, {
     // waveform
@@ -317,9 +317,7 @@ game.scene.set("mainmenu");
 game.start();
 game.pause();
 
-
 /* chords *
 "Ab4C5Eb5","Bb4Db5F5","Eb4G4Bb4Db5","F4Ab4C5",
 "Ab3C4Eb4","Bb3Db4F4","Eb3G3Bb3Db4","F3Ab3C4",
 */
-

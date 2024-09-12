@@ -19,7 +19,7 @@ export default {
         removeEmptyAttributes: true,
         minifyCSS: true,
         minifyJS: true,
-      }
-    })
+      },
+    }),
   ],
 };

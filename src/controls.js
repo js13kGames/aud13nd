@@ -6,7 +6,6 @@ function pluginControls() {
   const { setParams } = game.seq;
 
   const render = ({ x, y, w, h, p, props }) => {
-
     // offset dimensions by padding
     x += p;
     y += p;
@@ -16,7 +15,7 @@ function pluginControls() {
     const key = "lead";
     const { volume, tempo } = game.state;
     const instrument = game.state[key];
-    const { attack, decay, sustain, release, wave,  } = instrument.params;
+    const { attack, decay, sustain, release, wave } = instrument.params;
 
     // draw controls
     drawSlider({
@@ -128,7 +127,7 @@ function pluginControls() {
       w: w - 5 * 40 - 3 * 60 - 5 * 40,
       h: h,
       ...props,
-      alpha: 1
+      alpha: 1,
     });
 
     drawSlider({
@@ -265,13 +264,13 @@ function pluginControls() {
       },
     });
     // dimensions for layout
-    return {x, y, w, h: h + p};
-  }
+    return { x, y, w, h: h + p };
+  };
 
   return {
     name: "controls",
-    render
-  }
+    render,
+  };
 }
 
-export default pluginControls
+export default pluginControls;
