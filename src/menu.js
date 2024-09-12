@@ -36,7 +36,7 @@ function pluginMenu() {
     d: 20,
     w: 20,
     h: 20,
-    particles: [...Array(25).keys()].map(() => game.foes.makeParticle(20)),
+    particles: [...Array(40).keys()].map(() => game.foes.makeParticle(20)),
   };
 
   let time = 0;

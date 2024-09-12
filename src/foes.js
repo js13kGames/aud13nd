@@ -51,7 +51,7 @@ function pluginFoes() {
       // hold in spawn position before moving
       hold: config.hold,
       // animated particles for effects
-      particles: [...Array(25).keys()].map(() => makeParticle(diameter)),
+      particles: [...Array(40).keys()].map(() => makeParticle(diameter)),
     };
     foes.push(foe);
     // emit event for sound/fx
@@ -72,7 +72,7 @@ function pluginFoes() {
     const h = random(d, d / 2);
     const tilt = random(Math.PI, -Math.PI);
     const angle = random(Math.PI, -Math.PI);
-    const hue = random(300, 390);
+    const hue = random(240, 420);
     const t = 0.75;
     return { w, h, tilt, angle, t, hue };
   };
@@ -130,7 +130,7 @@ function pluginFoes() {
     gradient.addColorStop(0, "hsla(19,100%,50%,1)");
     gradient.addColorStop(0.6, "hsla(0,100%,50%,0)");
     ctx.fillStyle = gradient;
-    ctx.fill();
+    // ctx.fill();
     // ctx.lineWidth = 3;
     // ctx.strokeStyle = `hsla(27,100%,50%,.85)`;
     // ctx.stroke();
