@@ -1,3 +1,5 @@
+import $ from "./Gloop/util/$dom";
+
 function pluginMenu() {
   const game = this;
 
@@ -29,6 +31,32 @@ function pluginMenu() {
     mousedir = compass[Math.round(deg / 45) * 45];
   };
 
+  let keys = "x";
+  let cheat = "x38384040373937396665";
+  let timer = null;
+  const onKeydown = (ev) => {
+    switch (ev.code){
+      case "ArrowUp":
+        mousedir = "N";
+        break;
+      case "ArrowDown":
+        mousedir = "S";
+        break;
+      case "ArrowLeft":
+        mousedir = "W";
+        break;
+      case "ArrowRight":
+        mousedir = "E";
+        break;
+    }
+    clearTimeout(timer)
+    timer = setTimeout(() => keys = "x", 800);
+    keys += ev.keyCode;
+    if (keys === cheat){
+      game.emit("sequencer_unlocked")
+    }
+  }
+
   // static foe to render on the title
   const foe = {
     // x/y - set onPaint
@@ -44,7 +72,7 @@ function pluginMenu() {
     // keep track of time
     time += tick;
     // look for saved state
-    const { viewport, resume, highscore } = game.state;
+    const { viewport, resume, highscore, unlocked } = game.state;
     const { drawButton, drawLabel, clear } = game.canvas;
 
     // clear the canvas
@@ -142,6 +170,7 @@ function pluginMenu() {
         f: 16,
       });
     }
+    game.overlay.render();
   };
 
   // render text offscreen and return sampled pixel/particles
@@ -203,12 +232,14 @@ function pluginMenu() {
   const setup = () => {
     game.on("loop_paint", onPaint);
     game.canvas.$canvas.on("mousemove", onMousemove);
+    $(window).on("keydown", onKeydown);
     return teardown;
   };
 
   const teardown = () => {
     game.off("loop_paint", onPaint);
     game.canvas.$canvas.off("mousemove", onMousemove);
+    $(window).off("keydown", onKeydown);
   };
 
   return {
