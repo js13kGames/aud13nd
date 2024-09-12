@@ -324,7 +324,11 @@ function pluginSequencer() {
     return cols.length - killed.size;
   };
 
-  const getRandomRow = (key = "lead") => {
+  const getRandomRow = () => {
+    // limit to instruments with multiple rows
+    const valid = instruments.filter(key => game.state[key]?.rows.length > 1);
+    // pick a random valid instrument
+    const key = valid[Math.floor(game.random(valid.length))];
     const { notes, killed } = game.state[key];
     let row = null;
     do {
@@ -336,7 +340,7 @@ function pluginSequencer() {
       }
       // until a valid row is found
     } while (row == null);
-    return row;
+    return { key, row };
   };
 
   let layout = {};

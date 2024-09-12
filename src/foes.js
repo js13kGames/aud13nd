@@ -32,19 +32,24 @@ function pluginFoes() {
       delay -= tick;
       return; // don't spawn
     }
-    const { getRandomRow } = game.seq;
+    const { getRandomRow, cells } = game.seq;
     // pick a selected row to attack
-    const row = getRandomRow("lead");
+    const target = getRandomRow("lead");
+    // find the first matching cell index
+    const index = cells.findIndex(
+      cell => cell.key === target.key && cell.row === target.row
+    );
+    console.log(target, index, cells[index]);
     // pick a direction
     const dir = Math.round(game.random()) ? -1 : 1;
     // enemy size
     const diameter = 20;
     // create foe
     const foe = {
-      key: "lead",
+      ...target,
+      index,
       // abstract horiz starting position
       rx: dir > 0 ? LEFT : RIGHT,
-      row,
       d: diameter,
       // horizontal velocity pos left-to-right, neg right-to-left
       v: config.speed * dir,
@@ -85,7 +90,7 @@ function pluginFoes() {
     for (let i = 0; i < cells.length; i++) {
       const target = cells[i];
       // make sure target cell is selected and in the right row
-      if (target.on !== true || target.row != foe.row) {
+      if (foe.key != target.key || target.on !== true || target.row != foe.row) {
         continue; // skip
       }
       const left = Math.max(target.x, pos.x - pos.w / 2);
@@ -105,12 +110,12 @@ function pluginFoes() {
   };
 
   // get the actual centered position of a foe
-  const getPosition = ({ rx, row, d }) => {
+  const getPosition = ({ rx, index, d }) => {
     const { cells } = game.seq;
     // how to translate abstract to real position
     const sf = scaleFactor();
     // select the correct left/right cell to start from
-    const start = cells[row];
+    const start = cells[index];
     // real vertical position based on current row
     const y = start.y + start.h / 2;
     // real current position, scaled and offset
