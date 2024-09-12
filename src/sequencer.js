@@ -1,31 +1,22 @@
 import parseSong from "./Gloop/util/audio/parse/song";
-import makeRandom from "./Gloop/util/makeRandom";
 
 function pluginSequencer() {
   const game = this;
 
-  // on/off control of the sequencer
-  let isRunning = false;
+  const instruments = ["lead","bass","kick","snare","hat"];
 
-  const start = () => {
-    const delay = 1;
-    const { currentTime } = game.audio.ctx;
+  const onStart = () => {
     // reset each instrument timing
-    ["lead","bass","kick","snare","hat"].forEach(key => {
+    instruments.forEach(key => {
       const instrument = game.state[key];
-      instrument.time = currentTime + delay;
-      instrument.next = 0;
+      instrument.time = game.audio.ctx.currentTime;
+      instrument.next = -1;
     });
-    isRunning = true;
-  };
-
-  const stop = () => {
-    isRunning = false;
   };
 
   // sound scheduler
   const onLogic = () => {
-    if (!isRunning || game.state.paused) {
+    if (game.state.paused) {
       return;
     }
     scheduleSounds(game.state.lead, game.audio.playLead);
@@ -35,23 +26,26 @@ function pluginSequencer() {
     scheduleSounds(game.state.hat, game.audio.playHat);
   };
 
+  const LOOKAHEAD = 0.05; // 50 ms
   const scheduleSounds = (instrument, play) => {
-    const { tempo, lookAhead } = game.state.params;
+    const { tempo } = game.state;
     const { currentTime } = game.audio.ctx;
-    let { rows, cols, notes, next, time, killed } = instrument;
+    let { rows, cols, notes, next, time, killed, params } = instrument;
     // check for upcoming notes to schedule
-    while (time <= currentTime + lookAhead) {
-      const duration = cols[next] * (60 / tempo);
-      const tones = rows[notes[next]];
+    while (time <= currentTime + LOOKAHEAD) {
+      // next starts at -1
+      const n = next % cols.length;
+      const duration = next < 0 ? .5 : cols[n] * (60 / tempo);
+      const tones = next < 0 ? [0] : rows[notes[n]];
       // only make sound when column is not destroyed
-      if (killed.has(next) !== true){
+      if (next > -1 && killed.has(n) !== true){
         tones?.forEach((frequency) => {
-          play(time, frequency, duration);
+          play(time, frequency, duration, params);
         });
       }
       // move to next beat event
       time += duration;
-      next = (next + 1) % cols.length;
+      next += 1;
     }
     instrument.time = time;
     instrument.next = next;
@@ -65,9 +59,6 @@ function pluginSequencer() {
 
   // draw the sequencer grid
   const onPaint = () => {
-    if (!isRunning) {
-      return;
-    }
     const { clear, drawContainer } = game.canvas;
     const { viewport } = game.state;
 
@@ -121,48 +112,30 @@ function pluginSequencer() {
     // reset grid cells
     cells = game.seq.cells = [];
 
-
-    const percHeight = 60;
-    const kick = (
-      layout.kick !== true ?
-      { x:0, y:0, w:0, h:0 } :
-      renderInstrumentGrid("kick", {
+    // figure out the ideal row height based on all defined instruments
+    let totalRows = 0;
+    let totalGaps = 0;
+    instruments.forEach(key => {
+      const { rows } = game.state[key];
+      totalRows += rows.length;
+      totalGaps += rows.length ? padding : 0;
+    });
+    const totalHeight = container.h - controls.h - totalGaps - padding;
+    const rowHeight = totalHeight / totalRows;
+    // keep track of layout coords moving through instruments
+    let offsetY = container.y + padding;
+    let height = 0;
+    // layout each instrument
+    instruments.forEach(key => {
+      height = rowHeight * game.state[key].rows.length;
+      renderInstrumentGrid(key, {
         x: container.x,
-        y: controls.y - 3 * percHeight - padding,
+        y: offsetY,
         w: container.w,
-        h: percHeight,
-        p: 10
-      })
-    );
-    const snare = (
-      layout.snare !== true ?
-      { x:0, y:0, w:0, h:0 } :
-      renderInstrumentGrid("snare", {
-        x: container.x,
-        y: controls.y - 2 * percHeight - padding,
-        w: container.w,
-        h: percHeight,
-        p: 10
-      })
-    );
-    const hat = (
-      layout.hat !== true ?
-      { x:0, y:0, w:0, h:0 } :
-      renderInstrumentGrid("hat", {
-        x: container.x,
-        y: controls.y - 1 * percHeight - padding,
-        w: container.w,
-        h: percHeight,
-        p: 10
-      })
-    );
-
-    const grid = renderInstrumentGrid("lead", {
-      x: container.x,
-      y: container.y,
-      w: container.w,
-      h: container.h - controls.h - kick.h - snare.h - hat.h - padding,
-      p: padding
+        h: height,
+        p: padding
+      });
+      offsetY += height ? height + padding : 0;
     });
   };
 
@@ -187,11 +160,13 @@ function pluginSequencer() {
 
   // render the layout grid of a single instrument
   const renderInstrumentGrid = (key, { x, y, w, h, p }) => {
-    // offset dimensions by padding
+    // early exit when not visible
+    if (h === 0){
+      return;
+    }
+    // offset horizontal dimensions by padding
     x += p;
-    y += p;
     w -= p + p;
-    h -= p + p;
     const { ctx, drawBox } = game.canvas;
     const { rows, cols, duration, notes, next, killed } = game.state[key];
     // current cell dimensions
@@ -199,7 +174,8 @@ function pluginSequencer() {
     // const cellWidth = w / beats.length;
     const cellHeight = h / rows.length;
     const len = cols.length;
-    const beat = (next + len - 1) % len;
+    // current beat is the one before next
+    const beat = next < 1 ? 0 : (next - 1) % len;
     // draw every column
     for (let col = 0, dx = 0; col < cols.length; col++) {
       let cellWidth = cols[col] * beatWidth;
@@ -240,7 +216,7 @@ function pluginSequencer() {
   };
 
   // set up notes and beats for an instrument [key]
-  const loadSong = (key, song) => {
+  const loadSong = (key, song, params={}) => {
     let duration = 0;
     let cols = [];
     let rows = [];
@@ -275,11 +251,13 @@ function pluginSequencer() {
       // selected row index for each column
       notes,
       // index number of the next beat to play
-      next: 0,
+      next: -1,
       // audio clock to play the next note
       time: 0,
       // keep track of which cols have been hit
-      killed: new Map()
+      killed: new Map(),
+      // optional audio parameters
+      params: { ...defaults[key], ...params }
     });
   };
 
@@ -291,43 +269,39 @@ function pluginSequencer() {
     }
   };
 
+  // default params for each instrument
+  const defaults = {
+    lead: {
+      gain: 0.5,
+      wave: "sawtooth",
+      attack: 0.25,
+      decay: 0.25,
+      sustain: 0.8,
+      release: 0.5,
+    },
+    bass: {
+      gain: 0.5,
+    },
+    kick: {
+      gain: 0.5,
+    },
+    snare: {
+      gain: 0.5,
+    },
+    hat: {
+      gain: 0.5,
+    }
+  };
+
+  // final controls
+  game.set("volume", 1);
+  game.set("tempo", 120);
+
   // params are used to configure the audio components
-  game.set("params", {});
-  let random = makeRandom();
-  const setParams = (...args) => {
-    const params = game.get("params");
-    // set default values
-    if (args.length === 0) {
-      game.set("params", {
-        // beats per minute
-        tempo: 120,
-        // secs ahead to schedule audio
-        lookAhead: 0.05,
-        // amplitude
-        volume: 1,
-        // waveform
-        wave: "sawtooth",
-        // envelope
-        attack: 0.25,
-        decay: 0.25,
-        sustain: 0.8,
-        release: 0.5,
-        // gains
-        note: 0.5,
-        kick: 0.5,
-        snare: 0.5,
-        hat: 0.5
-      });
-    }
-    // merge in passed object
-    else if (args.length === 1) {
-      game.set("params", { ...params, ...args[0] });
-    }
-    // set a param value
-    else {
-      let [key, val] = args;
-      game.set("params", { ...params, [key]: val });
-    }
+  const setParams = (key, params) => {
+    const instrument = game.state[key];
+    Object.assign(instrument.params, params);
+    game.set(key, { ...instrument });
   };
 
   const onCollision = ({ key, col }) => {
@@ -351,7 +325,7 @@ function pluginSequencer() {
     let row = null;
     do {
       // target selected to prevent overloading only few rows
-      const col = Math.floor(random(notes.length));
+      const col = Math.floor(game.random(notes.length));
       // skip if the col is destroyed
       if (killed.has(col) !== true){
         row = notes[col];
@@ -369,32 +343,28 @@ function pluginSequencer() {
       layout = { ...features };
       // bind game event handlers
       game.on("loop_logic", onLogic);
-      game.on("clock_resume", start);
+      game.on("clock_resume", onStart);
       game.on("loop_paint", onPaint);
       game.on("foe_collision", onCollision);
-      setParams();
       // initialize instruments
-      loadSong("lead","R/1");
-      loadSong("bass","R/1");
-      loadSong("kick","R/1");
-      loadSong("snare","R/1");
-      loadSong("hat","R/1");
+      loadSong("lead","C D E F G A B C");
+      loadSong("bass","");
+      loadSong("kick","");
+      loadSong("snare","");
+      loadSong("hat","");
     },
     teardown: () => {
       // unbind game event handlers
       game.off("loop_logic", onLogic);
-      game.off("clock_resume", start);
+      game.off("clock_resume", onStart);
       game.off("loop_paint", onPaint);
       game.off("foe_collision", onCollision);
     },
-    start,
-    stop,
     setSelected,
     setParams,
     cells,
     getRandomRow,
     getBonusCount,
-    random,
     loadSong
   };
 }

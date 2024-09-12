@@ -161,7 +161,7 @@ function pluginAudio() {
   }
 
   // drum kick ~ E3/4
-  const playKick = (start, frequency=167.1, duration=0.5) => {
+  const playKick = (start, frequency=167.1, duration=0.5, params={}) => {
     // create a tone
     const osc = new OscillatorNode(ctx, {
       type: "sine",
@@ -187,7 +187,7 @@ function pluginAudio() {
   };
 
   // drum snare ~ G2/8
-  const playSnare = (start, frequency=100, duration=0.25) => {
+  const playSnare = (start, frequency=100, duration=0.25, params={}) => {
     // noise and filter
     const noise = makeNoiseBuffer();
     const filter = new BiquadFilterNode(ctx, {
@@ -264,7 +264,7 @@ function pluginAudio() {
   // };
 
   // drum hat ~ C3/2•
-  const playHat = (start, frequency=130.81, duration=1.5) => {
+  const playHat = (start, frequency=130.81, duration=1.5, params={}) => {
     // shape the envelope
     const env = new GainNode(ctx);
     env.gain.setValueAtTime(0.00001, start);
@@ -306,25 +306,53 @@ function pluginAudio() {
     node.gain.exponentialRampToValueAtTime(value, ctx.currentTime);
   };
 
-  game.on("state_change", ({ key, value: params, previous })=>{
-    if (key !== "params"){
-      return;
+  game.on("state_change", ({ key, value, previous })=>{
+    let node = null, num = null;
+    switch (key){
+      case "lead":
+        node = gainLead;
+        num = value?.params?.gain;
+        break;
+      case "bass":
+        node = gainBass;
+        num = value?.params?.gain;
+        break;
+      case "kick":
+        node = gainKick;
+        num = value?.params?.gain;
+        break;
+      case "snare":
+        node = gainSnare;
+        num = value?.params?.gain;
+        break;
+      case "hat":
+        node = gainHat;
+        num = value?.params?.gain;
+        break;
+      case "volume":
+        node = gainVolume;
+        num = value;
+        break;
     }
-    if (params.volume !== previous?.volume){
-      setGain(gainVolume, params.volume);
+    if (node != null && num != null){
+      setGain(node, num);
     }
-    if (params.note !== previous?.note){
-      setGain(gainNote, params.note);
-    }
-    if (params.kick !== previous?.kick){
-      setGain(gainKick, params.kick);
-    }
-    if (params.snare !== previous?.snare){
-      setGain(gainSnare, params.snare);
-    }
-    if (params.hat !== previous?.hat){
-      setGain(gainHat, params.hat);
-    }
+  });
+
+  const playSong = (song="", play=playLead, tempo=120) => {
+    let time = ctx.currentTime;
+    parseSong(song).forEach(({ count, tones }) => {
+      const duration = count * (60 / tempo);
+      tones.forEach(hz => play(time, hz, duration));
+      time += duration;
+    })
+  };
+
+  game.on("foe_collision", () => {
+    playSong("A4E7/2", playKick);
+  });
+  game.on("foe_expire", () => {
+    playSong("A7G3/4", playHat);
   });
 
   return {
