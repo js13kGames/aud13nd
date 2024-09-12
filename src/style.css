@@ -6,6 +6,9 @@ body {
   color: #333;
   background-color: #000;
   margin: 0;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
 }
 
 input[type-text], select {
