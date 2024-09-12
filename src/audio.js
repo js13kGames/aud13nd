@@ -1,4 +1,5 @@
 import $ from "./Gloop/util/$dom";
+import parseSong from "./Gloop/util/audio/parse/song";
 
 function pluginAudio() {
   const game = this;
@@ -14,12 +15,14 @@ function pluginAudio() {
     }
   });
   // a bunch of analyzers for each instrument
-  const graphNote = new AnalyserNode(ctx);
+  const graphLead = new AnalyserNode(ctx);
+  const graphBass = new AnalyserNode(ctx);
   const graphKick = new AnalyserNode(ctx);
   const graphSnare = new AnalyserNode(ctx);
   const graphHat = new AnalyserNode(ctx);
   // a bunch of gains to control each instrument
-  const gainNote = new GainNode(ctx);
+  const gainLead = new GainNode(ctx);
+  const gainBass = new GainNode(ctx);
   const gainKick = new GainNode(ctx);
   const gainSnare = new GainNode(ctx);
   const gainHat = new GainNode(ctx);
@@ -33,65 +36,19 @@ function pluginAudio() {
   // final gain to control volume
   const gainVolume = new GainNode(ctx);
   // wired it all together
-  gainNote.connect(graphNote).connect(limiter);
+  gainLead.connect(graphLead).connect(limiter);
+  gainBass.connect(graphBass).connect(limiter);
   gainKick.connect(graphKick).connect(limiter);
   gainSnare.connect(graphSnare).connect(limiter);
   gainHat.connect(graphHat).connect(limiter);
   limiter.connect(gainVolume).connect(ctx.destination);
 
-  // input and final gains
-  // const input = new GainNode(ctx, { gain: 1 });
-  // const volume = new GainNode(ctx);
-  // reverb gains
-  // const wet = new GainNode(ctx);
-  // const dry = new GainNode(ctx);
-  // mixer for reverb
-  // const compressor = new DynamicsCompressorNode(ctx, {
-  //   ratio: 4, // 4:1
-  //   threshold: -12, // dB
-  // });
-  // final limiter, compress loudest parts to prevent clipping
-
-  // const brickwall = new DynamicsCompressorNode(ctx, {
-  //   ratio: 40,
-  //   threshold: -5,
-  //   knee: 0,
-  //   attack: 0.001,
-  //   release: 0.1
-  // });
-  // reverb nodes
-  // const buffer = new AudioBuffer({
-  //   numberOfChannels: 2,
-  //   length: ctx.sampleRate * 2, // 2 seconds
-  //   sampleRate: ctx.sampleRate,
-  // });
-  // const decay = 1;
-  // const left = buffer.getChannelData(0);
-  // const right = buffer.getChannelData(1);
-  // const len = buffer.length;
-  // for (let i = 0; i < len; i++) {
-  //   left[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay);
-  //   right[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay);
-  // }
-  // const reverb = new ConvolverNode(ctx, { buffer });
-  // wire up audio nodes
-  // input.connect(wet).connect(reverb).connect(compressor);
-  // input.connect(dry).connect(compressor);
-  // compressor.connect(volume).connect(analyser).connect(ctx.destination);
-
-  // input.connect(wet).connect(reverb).connect(compressor);
-  // input.connect(dry).connect(compressor).connect(graphNote);
-  // graphNote.connect(brickwall);
-  // graphKick.connect(brickwall);
-  // graphSnare.connect(brickwall);
-  // graphHat.connect(brickwall);
-  // brickwall.connect(volume).connect(ctx.destination);
-
   const renderAnalyzers = (opts) => {
     renderAnalyzer(graphHat, { ...opts, hue: 290 });
     renderAnalyzer(graphSnare, { ...opts, hue: 210 });
     renderAnalyzer(graphKick, { ...opts, hue: 185 });
-    renderAnalyzer(graphNote, { ...opts, hue: 120 });
+    renderAnalyzer(graphBass, { ...opts, hue: 330 });
+    renderAnalyzer(graphLead, { ...opts, hue: 120 });
   }
 
   // draw analyzer graph of the audio stream
@@ -117,21 +74,9 @@ function pluginAudio() {
     ctx.stroke();
   };
 
-  // generate and shape a tone connected to the output
-  const playLead = (start, frequency=440, duration=0.5) => {
-    const {
-      wave,
-      attack,
-      decay,
-      sustain,
-      release
-    } = game.state.params;
-    //
-    const filter = new BiquadFilterNode(ctx, {
-      type: 'lowshelf',
-      frequency: 200,
-      gain: 5
-    });
+  // synth lead ~ A4/4
+  const playLead = (start, frequency=440, duration=0.5, params={}) => {
+    const { wave, attack, decay, sustain, release } = params;
     // create a tone
     const osc = new OscillatorNode(ctx, {
       type: wave,
@@ -139,11 +84,6 @@ function pluginAudio() {
     });
     // shape the tone
     const env = new GainNode(ctx);
-    /*
-       /\___
-     _/     \_
-      A D S R
-    */
     // shape envelope
     env.gain.setValueAtTime(0, start);
     env.gain.exponentialRampToValueAtTime(1, start + (attack * duration));
@@ -157,7 +97,7 @@ function pluginAudio() {
       osc.disconnect();
       env.disconnect();
     };
-    osc.connect(env).connect(gainNote); // .connect(filter)
+    osc.connect(env).connect(gainLead); // .connect(filter)
   }
 
   // drum kick ~ E3/4
@@ -228,7 +168,7 @@ function pluginAudio() {
     });
     const data = buffer.getChannelData(0);
     for (let i = 0; i < size; i++) {
-      data[i] = Math.random() * 2 - 1;
+      data[i] = game.random(2, 1);
     }
     return new AudioBufferSourceNode(ctx, { buffer });
   };
