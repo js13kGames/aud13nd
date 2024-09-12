@@ -45,7 +45,7 @@ game.scene.create("sequencer", () => {
     snare: true,
     hat: true,
     stats: false,
-    padding: 50,
+    padding: 20,
   });
   game.seq.loadSong("lead", songs.chords);
   game.seq.loadSong("kick", "C7/4 D7/4 E7/4 F7/4 G7/4 A7/4 B7/4");

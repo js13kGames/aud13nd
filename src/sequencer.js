@@ -65,7 +65,7 @@ function pluginSequencer() {
     // clear the canvas
     clear();
 
-    const { padding = 100 } = layout;
+    const { padding = 50 } = layout;
 
     game.audio.renderAnalyzers({
       x: 0,
@@ -82,7 +82,7 @@ function pluginSequencer() {
       y: 0,
       w: viewport.w,
       h: viewport.h,
-      p: 100,
+      p: padding,
       r: 25,
     });
     if (layout.stats !== false) {
