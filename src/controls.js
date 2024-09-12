@@ -13,9 +13,10 @@ function pluginControls() {
     w -= p + p;
     h -= p + p;
 
-    // props = { ...props, sat: 0 };
-
-    const { attack, decay, sustain, release, wave, tempo, volume, note, kick, snare, hat } = game.state.params;
+    const key = "lead";
+    const { volume, tempo } = game.state;
+    const instrument = game.state[key];
+    const { attack, decay, sustain, release, wave,  } = instrument.params;
 
     // draw controls
     drawSlider({
@@ -28,7 +29,7 @@ function pluginControls() {
       value: attack,
       min: 0.00001,
       max: 1,
-      onChange: (v) => setParams("attack", parseFloat(v)),
+      onChange: (v) => setParams(key, { attack: parseFloat(v) }),
     });
 
     drawSlider({
@@ -41,7 +42,7 @@ function pluginControls() {
       value: decay,
       min: 0.00001,
       max: 1,
-      onChange: (v) => setParams("decay", parseFloat(v)),
+      onChange: (v) => setParams(key, { decay: parseFloat(v) }),
     });
 
     drawSlider({
@@ -54,7 +55,7 @@ function pluginControls() {
       value: sustain,
       min: 0.00001,
       max: 1,
-      onChange: (v) => setParams("sustain", parseFloat(v)),
+      onChange: (v) => setParams(key, { sustain: parseFloat(v) }),
     });
 
     drawSlider({
@@ -67,7 +68,7 @@ function pluginControls() {
       value: release,
       min: 0.00001,
       max: 1,
-      onChange: (v) => setParams("release", parseFloat(v)),
+      onChange: (v) => setParams(key, { release: parseFloat(v) }),
     });
 
     drawButton({
@@ -78,7 +79,7 @@ function pluginControls() {
       ...props,
       value: "SAW",
       on: wave == "sawtooth",
-      onChange: () => setParams("wave", "sawtooth"),
+      onChange: () => setParams(key, { wave: "sawtooth" }),
     });
 
     drawButton({
@@ -89,7 +90,7 @@ function pluginControls() {
       ...props,
       value: "SIN",
       on: wave == "sine",
-      onChange: () => setParams("wave", "sine"),
+      onChange: () => setParams(key, { wave: "sine" }),
     });
 
     drawButton({
@@ -100,7 +101,7 @@ function pluginControls() {
       ...props,
       value: "SQU",
       on: wave == "square",
-      onChange: () => setParams("wave", "square"),
+      onChange: () => setParams(key, { wave: "square" }),
     });
 
     drawButton({
@@ -111,7 +112,7 @@ function pluginControls() {
       ...props,
       value: "TRI",
       on: wave == "triangle",
-      onChange: () => setParams("wave", "triangle"),
+      onChange: () => setParams(key, { wave: "triangle" }),
     });
 
     drawLabel({
@@ -137,10 +138,10 @@ function pluginControls() {
       w: 40,
       h: h,
       ...props,
-      value: note,
+      value: game.state.lead.params.gain,
       min: 0.00001,
       max: 1,
-      onChange: (v) => setParams("note", parseFloat(v)),
+      onChange: (v) => setParams("lead", { gain: parseFloat(v) }),
     });
 
     drawSlider({
@@ -150,10 +151,10 @@ function pluginControls() {
       w: 40,
       h: h,
       ...props,
-      value: kick,
+      value: game.state.kick.params.gain,
       min: 0.00001,
       max: 1,
-      onChange: (v) => setParams("kick", parseFloat(v)),
+      onChange: (v) => setParams("kick", { gain: parseFloat(v) }),
     });
 
     drawSlider({
@@ -163,10 +164,10 @@ function pluginControls() {
       w: 40,
       h: h,
       ...props,
-      value: snare,
+      value: game.state.snare.params.gain,
       min: 0.00001,
       max: 1,
-      onChange: (v) => setParams("snare", parseFloat(v)),
+      onChange: (v) => setParams("snare", { gain: parseFloat(v) }),
     });
 
     drawSlider({
@@ -176,25 +177,11 @@ function pluginControls() {
       w: 40,
       h: h,
       ...props,
-      value: hat,
+      value: game.state.hat.params.gain,
       min: 0.00001,
       max: 1,
-      onChange: (v) => setParams("hat", parseFloat(v)),
+      onChange: (v) => setParams("hat", { gain: parseFloat(v) }),
     });
-
-    // drawSlider({
-    //   label: "TEMPO",
-    //   x: x + w - 4 * 60,
-    //   y: y,
-    //   w: 60,
-    //   h: h,
-    //   ...props,
-    //   value: tempo,
-    //   min: 60,
-    //   max: 600,
-
-    //   onChange: (v) => setParams("tempo", parseFloat(v)),
-    // });
 
     drawButton({
       x: x + w - 3 * 60 - 1 * 40,
@@ -204,7 +191,7 @@ function pluginControls() {
       ...props,
       value: "240",
       on: tempo == 240,
-      onChange: () => setParams("tempo", 240),
+      onChange: () => game.set("tempo", 240),
     });
 
     drawButton({
@@ -215,7 +202,7 @@ function pluginControls() {
       ...props,
       value: "180",
       on: tempo == 180,
-      onChange: () => setParams("tempo", 180),
+      onChange: () => game.set("tempo", 180),
     });
 
     drawButton({
@@ -226,7 +213,7 @@ function pluginControls() {
       ...props,
       value: "120",
       on: tempo == 120,
-      onChange: () => setParams("tempo", 120),
+      onChange: () => game.set("tempo", 120),
     });
 
     drawButton({
@@ -237,7 +224,7 @@ function pluginControls() {
       ...props,
       value: "60",
       on: tempo == 60,
-      onChange: () => setParams("tempo", 60),
+      onChange: () => game.set("tempo", 60),
     });
 
     drawLabel({
@@ -257,7 +244,7 @@ function pluginControls() {
       value: volume,
       min: 0.00001,
       max: 2,
-      onChange: (v) => setParams("volume", parseFloat(v)),
+      onChange: (v) => game.set("volume", parseFloat(v)),
     });
 
     drawButton({
