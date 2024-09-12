@@ -37,7 +37,7 @@ function pluginFoes() {
     // pick a selected row to attack
     const row = getRandomRow("lead");
     // pick a direction
-    const dir = Math.round(game.seq.random()) ? -1 : 1;
+    const dir = Math.round(game.random()) ? -1 : 1;
     // enemy size
     const diameter = 20;
     // create foe
@@ -52,7 +52,9 @@ function pluginFoes() {
       // hold in spawn position before moving
       hold: config.hold,
       // animated particles for effects
-      particles: [...Array(13).keys()].map(makeParticle)
+      particles: [...Array(25).keys()].map(
+        () => makeParticle(diameter)
+      )
     };
     foes.push(foe);
     // emit event for sound/fx
@@ -61,20 +63,21 @@ function pluginFoes() {
     delay = config.delay;
   };
 
-  const makeParticle = () => {
-    const { random } = game.seq;
+  const makeParticle = (d) => {
+    const { random } = game;
     // particles are just arc segments on elliptical path
     // x/y - will be the foe center location
     // w/h - will be the radiusX and radiusY
     // tilt - will be the rotation angle of the whole ellipse
     // angle - will be animated around the shape over time
     // t - how long the sparks survive after collision
-    const w = random(30, 5);
-    const h = random(20, 5);
+    const w = random(d*2, d/2);
+    const h = random(d, d/2);
     const tilt = random(Math.PI, -Math.PI);
     const angle = random(Math.PI, -Math.PI);
-    const t = 1;
-    return { w, h, tilt, angle, t };
+    const hue = random(300,390);
+    const t = .75;
+    return { w, h, tilt, angle, t, hue };
   }
 
   const checkCollisions = (foe) => {
@@ -120,16 +123,20 @@ function pluginFoes() {
 
   const drawFoe = (foe) => {
     const { ctx } = game.canvas;
-    const { x, y, w } = getPosition(foe);
+    const { x, y, w } = foe.x == null ? getPosition(foe) : foe;
     // draw the core
     ctx.beginPath();
     // ctx.roundRect(x, y, w, h, w);
-    ctx.arc(x, y, w/3, 0, 2 * Math.PI, false);
-    ctx.fillStyle = `hsla(49,100%,50%,.85)`;
+    ctx.arc(x, y, w, 0, 2 * Math.PI, false);
+    // ctx.fillStyle = `hsla(42,100%,50%,.85)`;
+    const gradient = ctx.createRadialGradient(x, y, 0, x, y, w);
+    gradient.addColorStop(0, "hsla(19,100%,50%,1)");
+    gradient.addColorStop(.6, "hsla(0,100%,50%,0)");
+    ctx.fillStyle = gradient;
     ctx.fill();
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = `hsla(27,100%,50%,1)`;
-    ctx.stroke();
+    // ctx.lineWidth = 3;
+    // ctx.strokeStyle = `hsla(27,100%,50%,.85)`;
+    // ctx.stroke();
     // draw each particle orbiting core
     foe.particles.forEach(particle => {
       particle.x = x;
@@ -138,34 +145,31 @@ function pluginFoes() {
     });
   };
 
-  const drawParticle = ({ x, y, w, h, tilt, angle, t }) => {
+  const drawParticle = ({ x, y, w, h, tilt, angle, t, hue }) => {
     const { ctx } = game.canvas;
-    if (t != null){
-      // fade out over time
-      ctx.globalAlpha = t;
-    }
     ctx.lineWidth = 2;
-    ctx.strokeStyle = `hsla(5,100%,50%,.85)`;
+    ctx.strokeStyle = `hsla(${hue},100%,50%,1)`;
     ctx.beginPath();
     ctx.ellipse(x, y, w, h, tilt, angle, angle + t);
     ctx.stroke();
-    ctx.globalAlpha = 1;
   };
 
   const onLogic = ({ tick }) => {
     // update every foe particle
     foes.forEach(foe => {
       foe.particles.forEach(particle => {
-        particle.angle += tick * 20;
+        particle.angle += tick * 30;
+        particle.tilt -= tick * 3;
       });
     });
     // update every spark particle
     sparks = sparks.flatMap(spark => {
       // rotate
-      spark.angle += tick * 20;
+      spark.angle += tick * 30;
+      spark.tilt -= tick * 3;
       // get bigger
-      spark.w *= 1.1;
-      spark.h *= 1.1;
+      spark.w *= 1.2;
+      spark.h *= 1.2;
       // decrement time
       spark.t -= tick;
       // remove it when it expires
@@ -180,6 +184,14 @@ function pluginFoes() {
     // check for completion
     if (game.state.countdown <= 0){
       game.pause();
+      // expire remaining foes
+      let score = game.state.levelscore;
+      foes.forEach(foe => {
+        sparks.push(...foe.particles);
+        score += 100;
+      });
+      foes = [];
+      game.set("levelscore", score);
       game.emit("level_completed");
       return;
     }
@@ -255,7 +267,9 @@ function pluginFoes() {
   return {
     name: "foes",
     setup,
-    teardown
+    teardown,
+    drawFoe,
+    makeParticle
   };
 };
 
