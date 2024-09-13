@@ -269,9 +269,8 @@ function pluginSequencer() {
   };
 
   const onCollision = ({ key, col }) => {
-    const { cols, killed } = game.state[key];
-    killed.set(col, true);
-    if (killed.size >= cols.length) {
+    game.state[key].killed.set(col, true);
+    if (countRemainingCols() === 0) {
       // level failed
       game.pause();
       game.emit("level_failed");
@@ -279,9 +278,18 @@ function pluginSequencer() {
   };
 
   // score bonus points for instrument columns not destroyed
-  const getBonusCount = (key = "lead") => {
-    const { cols, killed } = game.state[key];
-    return cols.length - killed.size;
+  const countRemainingCols = () => {
+    let available = 0;
+    let destroyed = 0;
+    instruments.forEach((key) => {
+      const { rows, cols, killed } = game.state[key];
+      // don't count single row instruments
+      if (rows.length > 1){
+        available += cols.length;
+      }
+      destroyed += killed.size;
+    }, 0);
+    return available - destroyed;
   };
 
   const getRandomRow = () => {
@@ -290,17 +298,17 @@ function pluginSequencer() {
     // pick a random valid instrument
     const key = valid[Math.floor(game.random(valid.length))];
     const { notes, killed } = game.state[key];
-    let row = null;
-    do {
+    const { length } = notes;
+    // look for rows to attack a limited number of tries
+    for (let i = 0; i < length; i++){
       // target selected to prevent overloading only few rows
-      const col = Math.floor(game.random(notes.length));
+      const col = Math.floor(game.random(length));
       // skip if the col is destroyed
-      if (killed.has(col) !== true) {
-        row = notes[col];
+      if (killed.has(col) !== true){
+        // found a target
+        return { key, row: notes[col] };
       }
-      // until a valid row is found
-    } while (row == null);
-    return { key, row };
+    }
   };
 
   let layout = {};
@@ -332,7 +340,7 @@ function pluginSequencer() {
     setParams,
     cells,
     getRandomRow,
-    getBonusCount,
+    countRemainingCols,
     loadSong,
   };
 }

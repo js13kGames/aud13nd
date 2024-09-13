@@ -49,7 +49,7 @@ function pluginOverlay() {
     game.set("overlayVisible", true);
     // update total score
     const { totalscore, levelscore, highscore } = game.state;
-    const bonus = game.seq.getBonusCount() * 50;
+    const bonus = game.seq.countRemainingCols() * 50;
     const score = totalscore + levelscore + bonus;
     game.set("totalscore", score);
     game.set("levelscore", 0);

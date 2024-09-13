@@ -34,12 +34,14 @@ function pluginFoes() {
     }
     const { getRandomRow, cells } = game.seq;
     // pick a selected row to attack
-    const target = getRandomRow("lead");
+    const target = getRandomRow();
+    if (!target){
+      return;
+    }
     // find the first matching cell index
     const index = cells.findIndex(
       cell => cell.key === target.key && cell.row === target.row
     );
-    console.log(target, index, cells[index]);
     // pick a direction
     const dir = Math.round(game.random()) ? -1 : 1;
     // enemy size
@@ -56,7 +58,7 @@ function pluginFoes() {
       // hold in spawn position before moving
       hold: config.hold,
       // animated particles for effects
-      particles: [...Array(40).keys()].map(() => makeParticle(diameter)),
+      particles: [...Array(30).keys()].map(() => makeParticle(diameter)),
     };
     foes.push(foe);
     // emit event for sound/fx
