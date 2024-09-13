@@ -43,11 +43,11 @@ game.scene.create("sequencer", () => {
     controls: true,
     stats: false,
   });
-  game.seq.loadSong("lead", "");
-  game.seq.loadSong("bass", songs.we_will_rock_bass);
-  game.seq.loadSong("kick", songs.we_will_rock_kick);
-  game.seq.loadSong("snare", songs.we_will_rock_snare);
-  game.seq.loadSong("hat", "");
+  game.seq.loadSong("lead", "C5/4 D5/4 E5/4 F5/4 G5/4 A5/4 B5/4 C6/4");
+  game.seq.loadSong("bass", "C4/4 B3/4 A3/4 G3/4 F3/4 E3/4 D3/4 C3/4");
+  game.seq.loadSong("kick", "E3/4 E3/4 E3/4 E3/4 E3/4 E3/4 E3/4 E3/4");
+  game.seq.loadSong("snare", "G2/8 G2/8 G2/8 G2/8 G2/8 G2/8 G2/8 G2/8");
+  game.seq.loadSong("hat", "C3/2 C3/2 C3/2 C3/2");
   return () => {
     game.seq.teardown();
   };
