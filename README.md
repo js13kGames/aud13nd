@@ -6,7 +6,7 @@ different sound. You must change note selections to avoid particles that will
 attack each row from left and right. If you fail, the audio will <i>end</i> for
 that beat. Survive all 13 levels to unlock full audio sequencer.
 
-[screenshot]
+<img src="./screenshot.png" />
 
 ## Gloop
 
