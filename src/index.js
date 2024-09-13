@@ -41,14 +41,13 @@ game.scene.create("mainmenu", game.menu.setup);
 game.scene.create("sequencer", () => {
   game.seq.setup({
     controls: true,
-    stats: false,
-    padding: 20,
+    stats: false
   });
   game.seq.loadSong("lead","");
-  game.seq.loadSong("bass","");
-  game.seq.loadSong("kick", "E3/8 E3/8 E3/8 E3/8 E3/8 E3/8 E3/8 E3/8");
-  game.seq.loadSong("snare", "E3/8 E3/8 E3/8 E3/8 E3/8 E3/8 E3/8 E3/8");
-  game.seq.loadSong("hat", "E3/8 E3/8 E3/8 E3/8 E3/8 E3/8 E3/8 E3/8");
+  game.seq.loadSong("bass",songs.we_will_rock_bass);
+  game.seq.loadSong("kick", songs.we_will_rock_kick);
+  game.seq.loadSong("snare", songs.we_will_rock_snare);
+  game.seq.loadSong("hat", "");
   return () => {
     game.seq.teardown();
   };
@@ -65,6 +64,7 @@ game.scene.create("Level 1", () => {
     speed: 110,
     countdown: 10,
   });
+  game.set("tempo", 120);
   game.seq.loadSong("lead", songs.chords1);
   game.set("nextLevel", "Level 2");
   return () => {
@@ -80,6 +80,7 @@ game.scene.create("Level 2", () => {
     speed: 120,
     countdown: 20,
   });
+  game.set("tempo", 120);
   game.seq.loadSong("lead", songs.twinkle, {
     wave: "sine",
     attack: 0.1,
@@ -101,7 +102,8 @@ game.scene.create("Level 3", () => {
     speed: 120,
     countdown: 30,
   });
-  game.seq.loadSong("lead", songs.fur_elise, {
+  game.set("tempo", 120);
+  game.seq.loadSong("lead", songs.cmajor, {
     wave: "square",
     attack: 0.1,
     decay: 0.1,
@@ -122,7 +124,8 @@ game.scene.create("Level 4", () => {
     speed: 130,
     countdown: 40,
   });
-  game.seq.loadSong("lead", songs.cmajor);
+  game.set("tempo", 120);
+  game.seq.loadSong("lead", songs.fur_elise);
   game.set("nextLevel", "Level 5");
   return () => {
     game.seq.teardown();
@@ -137,7 +140,9 @@ game.scene.create("Level 5", () => {
     speed: 140,
     countdown: 50,
   });
+  game.set("tempo", 120);
   game.seq.loadSong("lead", songs.chords2);
+  game.seq.loadSong("kick", songs.kick4s);
   game.set("nextLevel", "Level 6");
   return () => {
     game.seq.teardown();
@@ -152,13 +157,10 @@ game.scene.create("Level 6", () => {
     speed: 140,
     countdown: 60,
   });
-  game.seq.loadSong("lead", songs.mario, {
-    wave: "square",
-    attack: 0.1,
-    decay: 0.1,
-    sustain: 0.9,
-    release: 0.25,
-  });
+  game.set("tempo", 120);
+  game.seq.loadSong("lead", songs.we_will_rock_bass);
+  game.seq.loadSong("kick", songs.we_will_rock_kick);
+  game.seq.loadSong("snare", songs.we_will_rock_snare);
   game.set("nextLevel", "Level 7");
   return () => {
     game.seq.teardown();
@@ -173,13 +175,9 @@ game.scene.create("Level 7", () => {
     speed: 150,
     countdown: 70,
   });
-  game.seq.loadSong("lead", songs.seven_nation, {
-    wave: "sine",
-    attack: 0.1,
-    decay: 0.1,
-    sustain: 0.9,
-    release: 0.25,
-  });
+  game.set("tempo", 120);
+  game.seq.loadSong("bass", songs.seven_nation);
+  game.seq.loadSong("kick", songs.kick4s);
   game.set("nextLevel", "Level 8");
   return () => {
     game.seq.teardown();
@@ -190,22 +188,17 @@ game.scene.create("Level 7", () => {
 game.scene.create("Level 8", () => {
   game.seq.setup();
   game.foes.setup({
-    limit: 3,
+    limit: 4,
     speed: 150,
     countdown: 80,
   });
-  game.set("tempo", 80);
-  game.seq.loadSong("lead", songs.karma_lead, {
-    wave: "sine",
-    release: .9,
-    decay: .5,
-    gain: .5
-  });
-  game.seq.loadSong("bass", songs.karma_acc, {
-    wave: "sine",
-    release: .8,
-    decay: .4,
-    gain: .5
+  game.set("tempo", 120);
+  game.seq.loadSong("lead", songs.mario, {
+    wave: "square",
+    attack: 0.1,
+    decay: 0.1,
+    sustain: 0.9,
+    release: 0.25,
   });
   game.set("nextLevel", "Level 9");
   return () => {
@@ -221,7 +214,19 @@ game.scene.create("Level 9", () => {
     speed: 150,
     countdown: 90,
   });
-  // TODO game.seq.loadSong("lead")
+  game.set("tempo", 80);
+  game.seq.loadSong("lead", songs.karma_lead, {
+    wave: "sine",
+    release: .9,
+    decay: .5,
+    gain: .5
+  });
+  game.seq.loadSong("bass", songs.karma_acc, {
+    wave: "sine",
+    release: .8,
+    decay: .4,
+    gain: .5
+  });
   game.set("nextLevel", "Level 10");
   return () => {
     game.seq.teardown();
@@ -236,7 +241,16 @@ game.scene.create("Level 10", () => {
     speed: 160,
     countdown: 100,
   });
-  // TODO game.seq.loadSong("lead")
+  game.set("tempo", 160);
+  game.seq.loadSong("bass", songs.lev10_bass, {
+    wave: "sine",
+    attack: .1,
+    decay: .75,
+    sustain: .9,
+    release: .95,
+    gain: .5
+  });
+  game.seq.loadSong("hat", songs.lev10_hat, { gain:1 })
   game.set("nextLevel", "Level 11");
   return () => {
     game.seq.teardown();
@@ -251,7 +265,9 @@ game.scene.create("Level 11", () => {
     speed: 160,
     countdown: 110,
   });
-  // TODO game.seq.loadSong("lead")
+  game.set("tempo", 120);
+  game.seq.loadSong("bass", songs.lev11_bass);
+  game.seq.loadSong("kick", songs.lev11_kick);
   game.set("nextLevel", "Level 12");
   return () => {
     game.seq.teardown();
@@ -266,7 +282,9 @@ game.scene.create("Level 12", () => {
     speed: 160,
     countdown: 120,
   });
-  // TODO game.seq.loadSong("lead")
+  game.set("tempo", 120);
+  game.seq.loadSong("lead", songs.lev12_lead, {});
+  game.seq.loadSong("snare", songs.lev12_snare, {});
   game.set("nextLevel", "Level 13");
   return () => {
     game.seq.teardown();
@@ -281,7 +299,12 @@ game.scene.create("Level 13", () => {
     speed: 600,
     countdown: 130,
   });
-  // TODO game.seq.loadSong("lead")
+  game.set("tempo", 160);
+  // game.seq.loadSong("lead", songs.lev13_lead);
+  game.seq.loadSong("bass", songs.lev13_bass);
+  game.seq.loadSong("kick", songs.lev13_kick);
+  game.seq.loadSong("snare", songs.lev13_snare);
+  game.seq.loadSong("hat", songs.lev13_hat);
   return () => {
     game.seq.teardown();
     game.foes.teardown();
