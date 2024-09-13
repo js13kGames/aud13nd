@@ -1,5 +1,5 @@
 import Gloop from "./Gloop/Gloop";
-import debug from "./Gloop/plugin/debug";
+// import debug from "./Gloop/plugin/debug";
 import localStore from "./Gloop/plugin/localStore";
 import pauseWhenHidden from "./Gloop/plugin/pauseWhenHidden";
 import scene from "./Gloop/plugin/scene";
@@ -16,7 +16,7 @@ import songs from "./songs";
 
 // primary game instance, with extensions
 const game = new Gloop();
-game.plugin(debug);
+// game.plugin(debug);
 game.plugin(localStore, {
   name: "AUD13ND",
   keys: ["resume", "highscore", "totalscore", "unlocked"],
