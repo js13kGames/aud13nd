@@ -1,4 +1,5 @@
 import $ from "./Gloop/util/$dom";
+import getTitlePixels from "./title";
 
 function pluginMenu() {
   const game = this;
@@ -79,7 +80,7 @@ function pluginMenu() {
     clear();
 
     // render each pixel of the title
-    const pixels = getTitlePixels({
+    const pixels = getTitlePixels("AUD  ND","   13  ",{
       x: 50,
       y: 50,
       w: viewport.w - 100,
@@ -105,14 +106,14 @@ function pluginMenu() {
     // render foe
     game.foes.drawFoe({
       x: viewport.w / 2,
-      y: lastPixel.y + (viewport.h / 2 - lastPixel.y + lastPixel.h) / 2,
+      y: lastPixel.y + (viewport.h / 2 + 100 - lastPixel.y + lastPixel.h) / 2,
       ...foe,
     });
 
     drawButton({
       name: "Start",
       x: viewport.w / 2 - 100,
-      y: viewport.h / 2,
+      y: viewport.h / 2 + 100,
       w: 200,
       h: 60,
       f: 16,
@@ -132,7 +133,7 @@ function pluginMenu() {
       drawButton({
         name: "Resume",
         x: viewport.w / 2 - 100,
-        y: viewport.h / 2 + 60,
+        y: viewport.h / 2 + 160,
         w: 200,
         h: 60,
         f: 16,
@@ -149,7 +150,7 @@ function pluginMenu() {
       drawButton({
         name: "Sequencer",
         x: viewport.w / 2 - 100,
-        y: viewport.h / 2 + 60 + 60,
+        y: viewport.h / 2 + 220,
         w: 200,
         h: 60,
         f: 16,
@@ -165,68 +166,12 @@ function pluginMenu() {
       drawLabel({
         value: `Highscore ${highscore}`,
         x: viewport.w / 2,
-        y: viewport.h / 2 + 60 + 60 + 60 + 20,
+        y: viewport.h / 2 + 300,
         w: 200,
         f: 16,
       });
     }
     game.overlay.render();
-  };
-
-  // render text offscreen and return sampled pixel/particles
-  const memo = new Map();
-  const getTitlePixels = (opts = {}) => {
-    const key = JSON.stringify(opts);
-    if (!memo.has(key)) {
-      const { w, h, x: sx, y: sy, spacing, n, dir } = opts;
-      const txt1 = "AUD  ND";
-      const txt2 = "   13  ";
-      const size = 190;
-      // render text in offscreen canvas
-      const canvas = new OffscreenCanvas(w, h);
-      const ctx = canvas.getContext("2d");
-      ctx.font = `bold ${size}px Monaco, monospace`;
-      ctx.textBaseline = "middle";
-      ctx.textAlign = "center";
-      ctx.letterSpacing = "14px";
-      ctx.lineWidth = 8;
-      ctx.fillStyle = `#000000`;
-      ctx.fillText(txt1, w / 2, h / 3, w);
-      ctx.strokeStyle = "#000000";
-      ctx.strokeText(txt1, w / 2, h / 3, w);
-      ctx.fillStyle = `#FF0000`;
-      ctx.fillText(txt2, w / 2, h / 3, w);
-      ctx.strokeStyle = "#FF0000";
-      ctx.strokeText(txt2, w / 2, h / 3, w);
-      let particles = [];
-      // modify the sampled x/y pixels based on direction
-      const mx = /W/.test(dir) ? spacing - n - 1 : /E/.test(dir) ? n : 0;
-      const my = /N/.test(dir) ? spacing - n - 1 : /S/.test(dir) ? n : 0;
-      // read image data which has four values for each pixel [r, g, b, a, ...]
-      const { data, width } = ctx.getImageData(0, 0, w, h);
-      // iterate over the image data, one pixel (four values) at a time
-      for (let i = 0, w4 = width * 4; i < data.length; i += 4) {
-        // compute the x/y coords from array index
-        const x = Math.floor((i % w4) / 4);
-        const y = Math.floor(i / w4);
-        // only include sampled pixels
-        if (x % spacing === mx && y % spacing === my) {
-          // title pixel has alpha
-          if (data[i + 3] > 0) {
-            particles.push({
-              x: sx + x,
-              y: sy + y,
-              w: spacing,
-              h: spacing,
-              // red pixels are "on"
-              on: data[i + 0] > 0,
-            });
-          }
-        }
-      }
-      memo.set(key, particles);
-    }
-    return memo.get(key);
   };
 
   const setup = () => {
