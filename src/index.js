@@ -41,17 +41,14 @@ game.scene.create("mainmenu", game.menu.setup);
 game.scene.create("sequencer", () => {
   game.seq.setup({
     controls: true,
-    kick: true,
-    snare: true,
-    hat: true,
     stats: false,
     padding: 20,
   });
-  game.seq.loadSong("lead", songs.chords);
-  game.seq.loadSong("kick", "C7/4 D7/4 E7/4 F7/4 G7/4 A7/4 B7/4");
-  game.seq.loadSong("snare", "C7/4 D7/4 E7/4 F7/4 G7/4 A7/4 B7/4");
-  game.seq.loadSong("hat", "C7/4 D7/4 E7/4 F7/4 G7/4 A7/4 B7/4");
-  // scene teardown
+  game.seq.loadSong("lead","");
+  game.seq.loadSong("bass","");
+  game.seq.loadSong("kick", "E3/8 E3/8 E3/8 E3/8 E3/8 E3/8 E3/8 E3/8");
+  game.seq.loadSong("snare", "E3/8 E3/8 E3/8 E3/8 E3/8 E3/8 E3/8 E3/8");
+  game.seq.loadSong("hat", "E3/8 E3/8 E3/8 E3/8 E3/8 E3/8 E3/8 E3/8");
   return () => {
     game.seq.teardown();
   };
@@ -62,26 +59,14 @@ game.scene.create("resume", () => {
 });
 
 game.scene.create("Level 1", () => {
-  game.set("nextLevel", "Level 2");
   game.seq.setup();
   game.foes.setup({
-    intro: 4,
-    delay: 2,
-    hold: 2,
     limit: 1,
     speed: 110,
     countdown: 10,
   });
-
-  game.seq.loadSong("lead", songs.twinkle, {
-    wave: "sine",
-    attack: 0.1,
-    decay: 0.1,
-    sustain: 0.9,
-    release: 0.25,
-  });
-
-  // scene teardown
+  game.seq.loadSong("lead", songs.chords1);
+  game.set("nextLevel", "Level 2");
   return () => {
     game.seq.teardown();
     game.foes.teardown();
@@ -89,24 +74,20 @@ game.scene.create("Level 1", () => {
 });
 
 game.scene.create("Level 2", () => {
-  game.set("nextLevel", "Level 3");
   game.seq.setup();
   game.foes.setup({
-    intro: 4,
-    delay: 2,
-    hold: 2,
     limit: 1,
     speed: 120,
     countdown: 20,
   });
-  game.seq.loadSong("lead", songs.cmajor, {
+  game.seq.loadSong("lead", songs.twinkle, {
     wave: "sine",
     attack: 0.1,
     decay: 0.1,
     sustain: 0.9,
     release: 0.25,
   });
-  // scene teardown
+  game.set("nextLevel", "Level 3");
   return () => {
     game.seq.teardown();
     game.foes.teardown();
@@ -114,24 +95,20 @@ game.scene.create("Level 2", () => {
 });
 
 game.scene.create("Level 3", () => {
-  game.set("nextLevel", "Level 4");
   game.seq.setup();
   game.foes.setup({
-    intro: 4,
-    delay: 2,
-    hold: 2,
     limit: 2,
     speed: 120,
     countdown: 30,
   });
-  game.seq.loadSong("lead", songs.cmajor, {
+  game.seq.loadSong("lead", songs.fur_elise, {
     wave: "square",
     attack: 0.1,
     decay: 0.1,
     sustain: 0.9,
     release: 0.25,
   });
-  // scene teardown
+  game.set("nextLevel", "Level 4");
   return () => {
     game.seq.teardown();
     game.foes.teardown();
@@ -139,15 +116,41 @@ game.scene.create("Level 3", () => {
 });
 
 game.scene.create("Level 4", () => {
-  game.set("nextLevel", "Level 5");
   game.seq.setup();
   game.foes.setup({
-    intro: 4,
-    delay: 2,
-    hold: 2,
     limit: 2,
     speed: 130,
     countdown: 40,
+  });
+  game.seq.loadSong("lead", songs.cmajor);
+  game.set("nextLevel", "Level 5");
+  return () => {
+    game.seq.teardown();
+    game.foes.teardown();
+  };
+});
+
+game.scene.create("Level 5", () => {
+  game.seq.setup();
+  game.foes.setup({
+    limit: 2,
+    speed: 140,
+    countdown: 50,
+  });
+  game.seq.loadSong("lead", songs.chords2);
+  game.set("nextLevel", "Level 6");
+  return () => {
+    game.seq.teardown();
+    game.foes.teardown();
+  };
+});
+
+game.scene.create("Level 6", () => {
+  game.seq.setup();
+  game.foes.setup({
+    limit: 3,
+    speed: 140,
+    countdown: 60,
   });
   game.seq.loadSong("lead", songs.mario, {
     wave: "square",
@@ -156,45 +159,7 @@ game.scene.create("Level 4", () => {
     sustain: 0.9,
     release: 0.25,
   });
-  // scene teardown
-  return () => {
-    game.seq.teardown();
-    game.foes.teardown();
-  };
-});
-
-game.scene.create("Level 5", () => {
-  game.set("nextLevel", "Level 6");
-  game.seq.setup();
-  game.foes.setup({
-    intro: 4,
-    delay: 2,
-    hold: 2,
-    limit: 2,
-    speed: 140,
-    countdown: 50,
-  });
-
-  // scene teardown
-  return () => {
-    game.seq.teardown();
-    game.foes.teardown();
-  };
-});
-
-game.scene.create("Level 6", () => {
   game.set("nextLevel", "Level 7");
-  game.seq.setup();
-  game.foes.setup({
-    intro: 4,
-    delay: 2,
-    hold: 2,
-    limit: 3,
-    speed: 140,
-    countdown: 60,
-  });
-
-  // scene teardown
   return () => {
     game.seq.teardown();
     game.foes.teardown();
@@ -202,18 +167,20 @@ game.scene.create("Level 6", () => {
 });
 
 game.scene.create("Level 7", () => {
-  game.set("nextLevel", "Level 8");
   game.seq.setup();
   game.foes.setup({
-    intro: 4,
-    delay: 2,
-    hold: 2,
     limit: 3,
     speed: 150,
     countdown: 70,
   });
-
-  // scene teardown
+  game.seq.loadSong("lead", songs.seven_nation, {
+    wave: "sine",
+    attack: 0.1,
+    decay: 0.1,
+    sustain: 0.9,
+    release: 0.25,
+  });
+  game.set("nextLevel", "Level 8");
   return () => {
     game.seq.teardown();
     game.foes.teardown();
@@ -221,18 +188,26 @@ game.scene.create("Level 7", () => {
 });
 
 game.scene.create("Level 8", () => {
-  game.set("nextLevel", "Level 9");
   game.seq.setup();
   game.foes.setup({
-    intro: 4,
-    delay: 2,
-    hold: 2,
     limit: 3,
     speed: 150,
     countdown: 80,
   });
-
-  // scene teardown
+  game.set("tempo", 80);
+  game.seq.loadSong("lead", songs.karma_lead, {
+    wave: "sine",
+    release: .9,
+    decay: .5,
+    gain: .5
+  });
+  game.seq.loadSong("bass", songs.karma_acc, {
+    wave: "sine",
+    release: .8,
+    decay: .4,
+    gain: .5
+  });
+  game.set("nextLevel", "Level 9");
   return () => {
     game.seq.teardown();
     game.foes.teardown();
@@ -240,18 +215,14 @@ game.scene.create("Level 8", () => {
 });
 
 game.scene.create("Level 9", () => {
-  game.set("nextLevel", "Level 10");
   game.seq.setup();
   game.foes.setup({
-    intro: 4,
-    delay: 2,
-    hold: 2,
     limit: 4,
     speed: 150,
     countdown: 90,
   });
-
-  // scene teardown
+  // TODO game.seq.loadSong("lead")
+  game.set("nextLevel", "Level 10");
   return () => {
     game.seq.teardown();
     game.foes.teardown();
@@ -259,18 +230,14 @@ game.scene.create("Level 9", () => {
 });
 
 game.scene.create("Level 10", () => {
-  game.set("nextLevel", "Level 11");
   game.seq.setup();
   game.foes.setup({
-    intro: 4,
-    delay: 2,
-    hold: 2,
     limit: 4,
     speed: 160,
     countdown: 100,
   });
-
-  // scene teardown
+  // TODO game.seq.loadSong("lead")
+  game.set("nextLevel", "Level 11");
   return () => {
     game.seq.teardown();
     game.foes.teardown();
@@ -278,18 +245,14 @@ game.scene.create("Level 10", () => {
 });
 
 game.scene.create("Level 11", () => {
-  game.set("nextLevel", "Level 12");
   game.seq.setup();
   game.foes.setup({
-    intro: 4,
-    delay: 2,
-    hold: 2,
     limit: 5,
     speed: 160,
     countdown: 110,
   });
-
-  // scene teardown
+  // TODO game.seq.loadSong("lead")
+  game.set("nextLevel", "Level 12");
   return () => {
     game.seq.teardown();
     game.foes.teardown();
@@ -297,18 +260,14 @@ game.scene.create("Level 11", () => {
 });
 
 game.scene.create("Level 12", () => {
-  game.set("nextLevel", "Level 13");
   game.seq.setup();
   game.foes.setup({
-    intro: 4,
-    delay: 2,
-    hold: 2,
     limit: 5,
     speed: 160,
     countdown: 120,
   });
-
-  // scene teardown
+  // TODO game.seq.loadSong("lead")
+  game.set("nextLevel", "Level 13");
   return () => {
     game.seq.teardown();
     game.foes.teardown();
@@ -318,16 +277,11 @@ game.scene.create("Level 12", () => {
 game.scene.create("Level 13", () => {
   game.seq.setup();
   game.foes.setup({
-    intro: 4,
-    delay: 2,
-    hold: 2,
     limit: 5,
     speed: 600,
     countdown: 130,
   });
-  game.seq.loadSong("lead","C/16 C#/16 D/16 D#/16 E/16 F/16 F#/16 G/16 G#/16 A/16 A#/16 B/16 F/16 G/16 A/16 C/16");
-  game.seq.loadSong("kick","G3/8 G3/8 G3/8 G3/8 G3/8 G3/8 G3/8 G3/8");
-  // scene teardown
+  // TODO game.seq.loadSong("lead")
   return () => {
     game.seq.teardown();
     game.foes.teardown();
@@ -338,8 +292,3 @@ game.scene.create("Level 13", () => {
 game.scene.set("mainmenu");
 game.start();
 game.pause();
-
-/* chords *
-"Ab4C5Eb5","Bb4Db5F5","Eb4G4Bb4Db5","F4Ab4C5",
-"Ab3C4Eb4","Bb3Db4F4","Eb3G3Bb3Db4","F3Ab3C4",
-*/
