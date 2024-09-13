@@ -184,7 +184,7 @@ function pluginSequencer() {
         ctx.fillRect(x + dx, y + h + props.p, cellWidth, 10);
       }
       // column note index
-      const note = notes[col] % rows.length;
+      const note = notes[col] ?? -1;
       // draw every row
       for (let row = 0; row < rows.length; row++) {
         const dy = row * cellHeight;
@@ -261,10 +261,10 @@ function pluginSequencer() {
   };
 
   // update the selected "notes" for an instrument
-  const setSelected = (key, row, col) => {
+  const setSelected = (key, row, col, turnOff) => {
     let { notes, rows } = game.state[key];
     if (rows[row] !== null) {
-      notes[col] = row;
+      notes[col] = turnOff ? null : row;
     }
   };
 

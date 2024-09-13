@@ -13,6 +13,7 @@ function pluginCanvas() {
   // detect clicks
   $canvas.on("click", (ev) => {
     const { offsetX, offsetY } = ev;
+    const jamMode = (game.state.scene === "sequencer");
     // check buttons
     buttons.forEach((button) => {
       const { x, y, w, h, onChange } = button;
@@ -30,7 +31,8 @@ function pluginCanvas() {
         const { key, row, col, x, y, w, h } = cell;
         if (offsetX > x && offsetX < x + w) {
           if (offsetY > y && offsetY < y + h) {
-            game.seq.setSelected(key, row, col);
+            const off = (jamMode && cell.on);
+            game.seq.setSelected(key, row, col, off);
             return;
           }
         }
