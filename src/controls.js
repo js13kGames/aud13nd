@@ -1,3 +1,5 @@
+import getTitlePixels from "./title";
+
 // sequencer controls to show/modify audio params
 function pluginControls() {
   const game = this;
@@ -11,120 +13,113 @@ function pluginControls() {
     y += p;
     w -= p + p;
     h -= p + p;
+    const mode = game.state.scene === "sequencer" ? "jam" : "game";
+    if (mode === "jam"){
+      renderSeqPanel({ x, y, w, h, p, props });
+    }
+    if (mode === "game"){
+      renderGamePanel({ x, y, w, h, p, props });
+    }
+    // dimensions for layout
+    return { x, y, w, h: h + p };
+  };
 
-    const key = "lead";
+  const renderGamePanel = ({ x, y, w, h, p, props }) => {
+    const { ctx } = game.canvas;
+
+    // audio graph
+    game.audio.renderAnalyzers({ x, y, w, h, ...props });
+
+    // level - time - score
+    ctx.fillStyle = `rgba(255,255,255,.75)`;
+    ctx.textBaseline = "top";
+    ctx.textAlign = "center";
+    ctx.font = "18px monospace";
+    ctx.letterSpacing = "1px";
+    ctx.textRendering = "optimizeLegibility";
+    const { scene, totalscore, levelscore, countdown } = game.state;
+    const score = totalscore + levelscore;
+    const stats = [scene, `Time ${Math.round(countdown)}`, `Score ${score}`];
+    ctx.fillText(stats.join(" • "), x + w/2, y, w);
+
+    // aud13nd
+    renderTitle({ x, y, w, h });
+  };
+
+  const renderTitle = ({ x, y, w, h }) => {
+    const { ctx } = game.canvas;
+    ctx.textBaseline = "bottom";
+    ctx.textAlign = "center";
+    ctx.font = "36px monospace";
+    ctx.letterSpacing = "12px";
+    ctx.textRendering = "optimizeLegibility";
+    ctx.fillStyle = `hsla(120,100%,50%,.3)`;
+    ctx.fillText("AUD  ND", x + w/2, y + h + 7, w);
+    ctx.fillStyle = `hsla(120,100%,50%,.6)`;
+    ctx.fillText("   13  ", x + w/2, y + h + 7, w);
+    ctx.letterSpacing = "0px";
+  }
+
+  const renderSeqPanel = ({ x, y, w, h, p, props }) => {
+
     const { volume, tempo } = game.state;
-    const instrument = game.state[key];
-    const { attack, decay, sustain, release, wave } = instrument.params;
 
-    // draw controls
-    drawSlider({
-      label: "ATT",
-      x: x + 0 * 40,
-      y: y,
-      w: 40,
-      h: h,
-      ...props,
-      value: attack,
-      min: 0.00001,
-      max: 1,
-      onChange: (v) => setParams(key, { attack: parseFloat(v) }),
-    });
+    let dx = 0;
+    const width = 40;
 
-    drawSlider({
-      label: "DEC",
-      x: x + 1 * 40,
-      y: y,
-      w: 40,
-      h: h,
-      ...props,
-      value: decay,
-      min: 0.00001,
-      max: 1,
-      onChange: (v) => setParams(key, { decay: parseFloat(v) }),
-    });
+    // give envelope controls for two main instruments
+    ["lead","bass"].forEach(key => {
 
-    drawSlider({
-      label: "SUS",
-      x: x + 2 * 40,
-      y: y,
-      w: 40,
-      h: h,
-      ...props,
-      value: sustain,
-      min: 0.00001,
-      max: 1,
-      onChange: (v) => setParams(key, { sustain: parseFloat(v) }),
-    });
+      // ADSR controls
+      ["attack","decay","sustain","release"].forEach(param => {
+        drawSlider({
+          label: param.substring(0, 3).toUpperCase(),
+          x: x + dx,
+          y: y,
+          w: width,
+          h: h,
+          ...props,
+          value: game.state[key].params[param],
+          min: 0.00001,
+          max: 1,
+          onChange: (v) => setParams(key, { [param]: parseFloat(v) }),
+        });
+        dx += width;
+      })
 
-    drawSlider({
-      label: "REL",
-      x: x + 3 * 40,
-      y: y,
-      w: 40,
-      h: h,
-      ...props,
-      value: release,
-      min: 0.00001,
-      max: 1,
-      onChange: (v) => setParams(key, { release: parseFloat(v) }),
-    });
+      let dy = 0;
+      let height = 30;
 
-    drawButton({
-      x: x + 4 * 40,
-      y: y,
-      w: 40,
-      h: 30,
-      ...props,
-      value: "SAW",
-      on: wave == "sawtooth",
-      onChange: () => setParams(key, { wave: "sawtooth" }),
-    });
+      // waveform buttons
+      const { wave } = game.state[key].params;
+      ["sawtooth","sine","square","triangle"].forEach(value => {
+        drawButton({
+          x: x + dx,
+          y: y + dy,
+          w: width,
+          h: height,
+          ...props,
+          value: value.substring(0,3).toUpperCase(),
+          on: wave == value,
+          onChange: () => setParams(key, { wave: value }),
+        });
+        dy += height;
+      })
 
-    drawButton({
-      x: x + 4 * 40,
-      y: y + 30,
-      w: 40,
-      h: 30,
-      ...props,
-      value: "SIN",
-      on: wave == "sine",
-      onChange: () => setParams(key, { wave: "sine" }),
-    });
+      drawLabel({
+        value: "WAVE",
+        x: x + dx + 20,
+        y: y + dy + props.p,
+        w: width,
+      });
 
-    drawButton({
-      x: x + 4 * 40,
-      y: y + 60,
-      w: 40,
-      h: 30,
-      ...props,
-      value: "SQU",
-      on: wave == "square",
-      onChange: () => setParams(key, { wave: "square" }),
-    });
-
-    drawButton({
-      x: x + 4 * 40,
-      y: y + 90,
-      w: 40,
-      h: 30,
-      ...props,
-      value: "TRI",
-      on: wave == "triangle",
-      onChange: () => setParams(key, { wave: "triangle" }),
-    });
-
-    drawLabel({
-      value: "WAVE",
-      x: x + 4 * 40 + 20,
-      y: y + 120 + props.p,
-      w: 40,
-    });
+      dx += width + width/2;
+    })
 
     game.audio.renderAnalyzers({
-      x: x + 5 * 40,
+      x: x + dx,
       y: y,
-      w: w - 5 * 40 - 3 * 60 - 6 * 40,
+      w: w - dx - 3 * 60 - 6 * 40,
       h: h,
       ...props,
       alpha: 1,
@@ -276,13 +271,14 @@ function pluginControls() {
         }
       },
     });
-    // dimensions for layout
-    return { x, y, w, h: h + p };
+
+    // aud13nd
+    renderTitle({ x, y, w, h });
   };
 
   return {
     name: "controls",
-    render,
+    render
   };
 }
 
