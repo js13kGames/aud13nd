@@ -60,11 +60,14 @@ function pluginFoes() {
       // animated particles for effects
       particles: [...Array(30).keys()].map(() => makeParticle(diameter)),
     };
-    foes.push(foe);
-    // emit event for sound/fx
-    game.emit("foe_spawn", foe);
-    // reset delay to next spawn
-    delay = config.delay;
+    // make sure foe is valid
+    if (foe.row != null && foe.index >= 0){
+      foes.push(foe);
+      // emit event for sound/fx
+      game.emit("foe_spawn", foe);
+      // reset delay to next spawn
+      delay = config.delay;
+    }
   };
 
   const makeParticle = (d) => {
@@ -80,7 +83,7 @@ function pluginFoes() {
     const tilt = random(Math.PI, -Math.PI);
     const angle = random(Math.PI, -Math.PI);
     const hue = random(240, 420);
-    const t = 0.75;
+    const t = 1;
     return { w, h, tilt, angle, t, hue };
   };
 
