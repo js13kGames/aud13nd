@@ -35,12 +35,12 @@ function pluginFoes() {
     const { getRandomRow, cells } = game.seq;
     // pick a selected row to attack
     const target = getRandomRow();
-    if (!target){
+    if (!target) {
       return;
     }
     // find the first matching cell index
     const index = cells.findIndex(
-      cell => cell.key === target.key && cell.row === target.row
+      (cell) => cell.key === target.key && cell.row === target.row,
     );
     // pick a direction
     const dir = Math.round(game.random()) ? -1 : 1;
@@ -61,7 +61,7 @@ function pluginFoes() {
       particles: [...Array(30).keys()].map(() => makeParticle(diameter)),
     };
     // make sure foe is valid
-    if (foe.row != null && foe.index >= 0){
+    if (foe.row != null && foe.index >= 0) {
       foes.push(foe);
       // emit event for sound/fx
       game.emit("foe_spawn", foe);
@@ -95,7 +95,11 @@ function pluginFoes() {
     for (let i = 0; i < cells.length; i++) {
       const target = cells[i];
       // make sure target cell is selected and in the right row
-      if (foe.key != target.key || target.on !== true || target.row != foe.row) {
+      if (
+        foe.key != target.key ||
+        target.on !== true ||
+        target.row != foe.row
+      ) {
         continue; // skip
       }
       const left = Math.max(target.x, pos.x - pos.w / 2);
@@ -196,7 +200,7 @@ function pluginFoes() {
       });
       foes = [];
       game.set("levelscore", score);
-      const won = (game.state.scene === "Level 13");
+      const won = game.state.scene === "Level 13";
       game.emit(won ? "sequencer_unlocked" : "level_completed");
       return;
     }

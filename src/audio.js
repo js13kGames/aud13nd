@@ -52,7 +52,7 @@ function pluginAudio() {
   };
 
   // draw analyzer graph of the audio stream
-  const renderAnalyzer = (node, { x, y, w, h, s, hue, alpha=1 }) => {
+  const renderAnalyzer = (node, { x, y, w, h, s, hue, alpha = 1 }) => {
     const { ctx } = game.canvas;
     // draw the frequency line
     ctx.lineWidth = s;
@@ -107,37 +107,37 @@ function pluginAudio() {
     osc.connect(env).connect(gainLead); // .connect(filter)
   };
 
-    // synth bass ~ C3/4
-    const playBass = (start, frequency = 440, duration = 0.5, params = {}) => {
-      const { wave, attack, decay, sustain, release } = params;
-      // create a tone
-      const osc = new OscillatorNode(ctx, {
-        type: wave,
-        frequency,
-      });
-      // shape the tone
-      const env = new GainNode(ctx);
-      // shape envelope
-      env.gain.setValueAtTime(0, start);
-      env.gain.exponentialRampToValueAtTime(1, start + attack * duration);
-      env.gain.exponentialRampToValueAtTime(
-        sustain,
-        start + attack * duration + decay * duration,
-      );
-      env.gain.exponentialRampToValueAtTime(
-        0.00001,
-        start + duration + release * duration,
-      );
-      // begin/end tone
-      osc.start(start);
-      osc.stop(start + duration + release * duration);
-      // cleanup
-      osc.onended = () => {
-        osc.disconnect();
-        env.disconnect();
-      };
-      osc.connect(env).connect(gainBass); // .connect(filter)
+  // synth bass ~ C3/4
+  const playBass = (start, frequency = 440, duration = 0.5, params = {}) => {
+    const { wave, attack, decay, sustain, release } = params;
+    // create a tone
+    const osc = new OscillatorNode(ctx, {
+      type: wave,
+      frequency,
+    });
+    // shape the tone
+    const env = new GainNode(ctx);
+    // shape envelope
+    env.gain.setValueAtTime(0, start);
+    env.gain.exponentialRampToValueAtTime(1, start + attack * duration);
+    env.gain.exponentialRampToValueAtTime(
+      sustain,
+      start + attack * duration + decay * duration,
+    );
+    env.gain.exponentialRampToValueAtTime(
+      0.00001,
+      start + duration + release * duration,
+    );
+    // begin/end tone
+    osc.start(start);
+    osc.stop(start + duration + release * duration);
+    // cleanup
+    osc.onended = () => {
+      osc.disconnect();
+      env.disconnect();
     };
+    osc.connect(env).connect(gainBass); // .connect(filter)
+  };
 
   // drum kick ~ E3/4
   const playKick = (start, frequency = 167.1, duration = 0.5, params = {}) => {

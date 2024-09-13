@@ -41,10 +41,10 @@ game.scene.create("mainmenu", game.menu.setup);
 game.scene.create("sequencer", () => {
   game.seq.setup({
     controls: true,
-    stats: false
+    stats: false,
   });
-  game.seq.loadSong("lead","");
-  game.seq.loadSong("bass",songs.we_will_rock_bass);
+  game.seq.loadSong("lead", "");
+  game.seq.loadSong("bass", songs.we_will_rock_bass);
   game.seq.loadSong("kick", songs.we_will_rock_kick);
   game.seq.loadSong("snare", songs.we_will_rock_snare);
   game.seq.loadSong("hat", "");
@@ -217,15 +217,15 @@ game.scene.create("Level 9", () => {
   game.set("tempo", 80);
   game.seq.loadSong("lead", songs.karma_lead, {
     wave: "sine",
-    release: .9,
-    decay: .5,
-    gain: .5
+    release: 0.9,
+    decay: 0.5,
+    gain: 0.5,
   });
   game.seq.loadSong("bass", songs.karma_acc, {
     wave: "sine",
-    release: .8,
-    decay: .4,
-    gain: .5
+    release: 0.8,
+    decay: 0.4,
+    gain: 0.5,
   });
   game.set("nextLevel", "Level 10");
   return () => {
@@ -244,13 +244,13 @@ game.scene.create("Level 10", () => {
   game.set("tempo", 160);
   game.seq.loadSong("bass", songs.lev10_bass, {
     wave: "sine",
-    attack: .1,
-    decay: .75,
-    sustain: .9,
-    release: .95,
-    gain: .5
+    attack: 0.1,
+    decay: 0.75,
+    sustain: 0.9,
+    release: 0.95,
+    gain: 0.5,
   });
-  game.seq.loadSong("hat", songs.lev10_hat, { gain:1 })
+  game.seq.loadSong("hat", songs.lev10_hat, { gain: 1 });
   game.set("nextLevel", "Level 11");
   return () => {
     game.seq.teardown();

@@ -14,10 +14,10 @@ function pluginControls() {
     w -= p + p;
     h -= p + p;
     const mode = game.state.scene === "sequencer" ? "jam" : "game";
-    if (mode === "jam"){
+    if (mode === "jam") {
       renderSeqPanel({ x, y, w, h, p, props });
     }
-    if (mode === "game"){
+    if (mode === "game") {
       renderGamePanel({ x, y, w, h, p, props });
     }
     // dimensions for layout
@@ -40,7 +40,7 @@ function pluginControls() {
     const { scene, totalscore, levelscore, countdown } = game.state;
     const score = totalscore + levelscore;
     const stats = [scene, `Time ${Math.round(countdown)}`, `Score ${score}`];
-    ctx.fillText(stats.join(" • "), x + w/2, y, w);
+    ctx.fillText(stats.join(" • "), x + w / 2, y, w);
 
     // aud13nd
     renderTitle({ x, y, w, h });
@@ -54,14 +54,13 @@ function pluginControls() {
     ctx.letterSpacing = "12px";
     ctx.textRendering = "optimizeLegibility";
     ctx.fillStyle = `hsla(120,100%,50%,.3)`;
-    ctx.fillText("AUD  ND", x + w/2, y + h + 7, w);
+    ctx.fillText("AUD  ND", x + w / 2, y + h + 7, w);
     ctx.fillStyle = `hsla(120,100%,50%,.6)`;
-    ctx.fillText("   13  ", x + w/2, y + h + 7, w);
+    ctx.fillText("   13  ", x + w / 2, y + h + 7, w);
     ctx.letterSpacing = "0px";
-  }
+  };
 
   const renderSeqPanel = ({ x, y, w, h, p, props }) => {
-
     const { volume, tempo } = game.state;
 
     // left to right
@@ -76,10 +75,9 @@ function pluginControls() {
     let dxr = 0;
 
     // give envelope controls for two main instruments
-    ["lead","bass"].forEach(key => {
-
+    ["lead", "bass"].forEach((key) => {
       // ADSR controls
-      ["attack","decay","sustain","release"].forEach(param => {
+      ["attack", "decay", "sustain", "release"].forEach((param) => {
         drawSlider({
           label: param.substring(0, 3).toUpperCase(),
           x: x + dx,
@@ -98,14 +96,14 @@ function pluginControls() {
       // waveform buttons
       dy = 0;
       const { wave } = game.state[key].params;
-      ["sawtooth","sine","square","triangle"].forEach(value => {
+      ["sawtooth", "sine", "square", "triangle"].forEach((value) => {
         drawButton({
           x: x + dx,
           y: y + dy,
           w: width,
           h: height,
           ...props,
-          value: value.substring(0,3).toUpperCase(),
+          value: value.substring(0, 3).toUpperCase(),
           on: wave == value,
           onChange: () => setParams(key, { wave: value }),
         });
@@ -119,8 +117,8 @@ function pluginControls() {
         w: width,
       });
 
-      dx += width + width/2;
-    })
+      dx += width + width / 2;
+    });
 
     // run control
     dxr += 120;
@@ -160,7 +158,7 @@ function pluginControls() {
     // tempo
     dxr += width;
     dy = 0;
-    [240, 180, 120, 60].forEach(bpm => {
+    [240, 180, 120, 60].forEach((bpm) => {
       drawButton({
         x: x + w - dxr,
         y: y + dy,
@@ -182,8 +180,8 @@ function pluginControls() {
     });
 
     // instrument gains
-    dxr += width/2;
-    ["lead","bass","kick","snare","hat"].reverse().forEach(key => {
+    dxr += width / 2;
+    ["lead", "bass", "kick", "snare", "hat"].reverse().forEach((key) => {
       dxr += width;
       drawSlider({
         label: key.toUpperCase(),
@@ -203,7 +201,7 @@ function pluginControls() {
     game.audio.renderAnalyzers({
       x: x + dx,
       y: y,
-      w: w - dx - dxr - width/2,
+      w: w - dx - dxr - width / 2,
       h: h,
       ...props,
       alpha: 1,
@@ -215,7 +213,7 @@ function pluginControls() {
 
   return {
     name: "controls",
-    render
+    render,
   };
 }
 

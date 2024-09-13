@@ -70,14 +70,11 @@ function pluginOverlay() {
     game.set("overlayVisible", true);
     game.set("unlocked", true);
     title = "Amazing Work!";
-    messages = [
-      "You unlocked the sequencer!",
-      "Have fun making music..."
-    ];
+    messages = ["You unlocked the sequencer!", "Have fun making music..."];
     buttonText = "Play Sequencer";
     onChange = () => {
       game.scene.set("sequencer");
-    }
+    };
   });
 
   const render = () => {

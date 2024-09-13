@@ -14,7 +14,7 @@ function pluginCanvas() {
   const dragging = {};
   $canvas.on("mousedown", (ev) => {
     const { offsetX, offsetY } = ev;
-    const jamMode = (game.state.scene === "sequencer");
+    const jamMode = game.state.scene === "sequencer";
     // check buttons
     buttons.forEach((button) => {
       const { x, y, w, h, onChange } = button;
@@ -37,7 +37,7 @@ function pluginCanvas() {
           dragging.type = `cell/${key}`;
           dragging.target = cell;
           dragging.from = [offsetX, offsetY];
-          const off = (jamMode && on === true);
+          const off = jamMode && on === true;
           game.seq.setSelected(key, row, col, off);
           return;
         }
@@ -65,7 +65,7 @@ function pluginCanvas() {
       const dx = offsetX - startX;
       const dy = offsetY - startY;
       // pythagorean distance
-      if (Math.sqrt(dx * dx + dy * dy) > 5){
+      if (Math.sqrt(dx * dx + dy * dy) > 5) {
         // go through every cell
         game.seq.cells.forEach((cell) => {
           const { key, row, col, x, y, w, h } = cell;

@@ -284,7 +284,7 @@ function pluginSequencer() {
     instruments.forEach((key) => {
       const { rows, cols, killed } = game.state[key];
       // don't count single row instruments
-      if (rows.length > 1){
+      if (rows.length > 1) {
         available += cols.length;
       }
       destroyed += killed.size;
@@ -294,17 +294,17 @@ function pluginSequencer() {
 
   const getRandomRow = () => {
     // limit to instruments with multiple rows
-    const valid = instruments.filter(key => game.state[key]?.rows.length > 1);
+    const valid = instruments.filter((key) => game.state[key]?.rows.length > 1);
     // pick a random valid instrument
     const key = valid[Math.floor(game.random(valid.length))];
     const { notes, killed } = game.state[key];
     const { length } = notes;
     // look for rows to attack a limited number of tries
-    for (let i = 0; i < length; i++){
+    for (let i = 0; i < length; i++) {
       // target selected to prevent overloading only few rows
       const col = Math.floor(game.random(length));
       // skip if the col is destroyed
-      if (killed.has(col) !== true){
+      if (killed.has(col) !== true) {
         // found a target
         return { key, row: notes[col] };
       }

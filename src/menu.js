@@ -36,7 +36,7 @@ function pluginMenu() {
   let cheat = "x38384040373937396665";
   let timer = null;
   const onKeydown = (ev) => {
-    switch (ev.code){
+    switch (ev.code) {
       case "ArrowUp":
         mousedir = "N";
         break;
@@ -50,13 +50,13 @@ function pluginMenu() {
         mousedir = "E";
         break;
     }
-    clearTimeout(timer)
-    timer = setTimeout(() => keys = "x", 800);
+    clearTimeout(timer);
+    timer = setTimeout(() => (keys = "x"), 800);
     keys += ev.keyCode;
-    if (keys === cheat){
-      game.emit("sequencer_unlocked")
+    if (keys === cheat) {
+      game.emit("sequencer_unlocked");
     }
-  }
+  };
 
   // static foe to render on the title
   const foe = {
@@ -80,7 +80,7 @@ function pluginMenu() {
     clear();
 
     // render each pixel of the title
-    const pixels = getTitlePixels("AUD  ND","   13  ",{
+    const pixels = getTitlePixels("AUD  ND", "   13  ", {
       x: 50,
       y: 50,
       w: viewport.w - 100,
@@ -101,7 +101,7 @@ function pluginMenu() {
     });
 
     // take the bottom of last pixel to figure out particle position
-    const lastPixel = pixels[pixels.length-1];
+    const lastPixel = pixels[pixels.length - 1];
 
     // render foe
     game.foes.drawFoe({

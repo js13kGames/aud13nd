@@ -1,11 +1,10 @@
-
 // render text offscreen and return sampled pixel/pixels
 const memo = new Map();
 
 const getTitlePixels = (txt1, txt2, opts = {}) => {
   const key = JSON.stringify([txt1, txt2, opts]);
   if (!memo.has(key)) {
-    const { w, h, x: sx, y: sy, fontSize=190, spacing, n, dir } = opts;
+    const { w, h, x: sx, y: sy, fontSize = 190, spacing, n, dir } = opts;
     // render text in offscreen canvas
     const canvas = new OffscreenCanvas(w, h);
     const ctx = canvas.getContext("2d");
