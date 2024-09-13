@@ -236,11 +236,11 @@ function pluginFoes() {
 
   let config = {
     // sec to play before spawns
-    intro: 3,
+    intro: 5,
     // sec between spawns
-    delay: 1,
+    delay: 2,
     // sec to hold after spawn before motion
-    hold: 1,
+    hold: 2,
     // most spawned foes allowed at same time
     limit: 1,
     // 0-1000 how fast the foes should move
