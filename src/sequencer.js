@@ -67,15 +67,6 @@ function pluginSequencer() {
 
     const { padding = 50 } = layout;
 
-    game.audio.renderAnalyzers({
-      x: 0,
-      y: 0,
-      ...viewport,
-      ...props,
-      s: 2,
-      alpha: 0.75,
-    });
-
     // draw bounding box
     const container = drawContainer({
       x: 0,
@@ -85,28 +76,16 @@ function pluginSequencer() {
       p: padding,
       r: 25,
     });
-    if (layout.stats !== false) {
-      renderStats({
-        x: viewport.w / 2,
-        y: container.y + container.h - 60,
-        w: container.w,
-        h: 50,
-        p: 0,
-      });
-    }
 
     const ctrlHeight = 120 + padding + padding;
-    const controls =
-      layout.controls !== true
-        ? { x: 0, y: 0, w: 0, h: 0 }
-        : game.controls.render({
-            x: container.x,
-            y: container.y + container.h - ctrlHeight,
-            w: container.w,
-            h: ctrlHeight,
-            p: padding,
-            props,
-          });
+    const controls = game.controls.render({
+      x: container.x,
+      y: container.y + container.h - ctrlHeight,
+      w: container.w,
+      h: ctrlHeight,
+      p: padding,
+      props,
+    });
 
     // reset grid cells
     cells = game.seq.cells = [];
@@ -136,25 +115,6 @@ function pluginSequencer() {
       });
       offsetY += height ? height + padding : 0;
     });
-  };
-
-  const renderStats = ({ x, y, w, h, p }) => {
-    // offset dimensions by padding
-    x += p;
-    y += p;
-    w -= p + p;
-    h -= p + p;
-    const { ctx } = game.canvas;
-    ctx.fillStyle = `rgba(255,255,255,.75)`;
-    ctx.textBaseline = "top";
-    ctx.textAlign = "center";
-    ctx.font = "18px monospace";
-    ctx.letterSpacing = "1px";
-    ctx.textRendering = "optimizeLegibility";
-    const { scene, totalscore, levelscore, countdown } = game.state;
-    const score = totalscore + levelscore;
-    const stats = [scene, `Time ${Math.round(countdown)}`, `Score ${score}`];
-    ctx.fillText(stats.join(" • "), x, y, w);
   };
 
   // render the layout grid of a single instrument
@@ -231,7 +191,7 @@ function pluginSequencer() {
         // strip duration off the input, for lookup
         const note = input.replace(/(?:\*\d+)?(?:\/\d+)?\.*$/g, "");
         // not in lookup yet
-        if (lookup[note] == null) {
+        if (note != "R" && lookup[note] == null) {
           lookup[note] = rows.push(tones) - 1;
         }
         notes.push(lookup[note]);
@@ -355,7 +315,7 @@ function pluginSequencer() {
       game.on("loop_paint", onPaint);
       game.on("foe_collision", onCollision);
       // initialize instruments
-      loadSong("lead", "C D E F G A B C");
+      loadSong("lead", "");
       loadSong("bass", "");
       loadSong("kick", "");
       loadSong("snare", "");
