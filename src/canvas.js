@@ -10,8 +10,9 @@ function pluginCanvas() {
   // canvas drawing context
   const ctx = canvas.getContext("2d");
 
-  // detect clicks
-  $canvas.on("click", (ev) => {
+  // detect mouse dragging
+  const dragging = {};
+  $canvas.on("mousedown", (ev) => {
     const { offsetX, offsetY } = ev;
     const jamMode = (game.state.scene === "sequencer");
     // check buttons
@@ -25,36 +26,19 @@ function pluginCanvas() {
       }
     });
     // block interactions
-    if (!game.state.overlayVisible) {
-      // check grid cells
-      game.seq.cells.forEach((cell) => {
-        const { key, row, col, x, y, w, h } = cell;
-        if (offsetX > x && offsetX < x + w) {
-          if (offsetY > y && offsetY < y + h) {
-            const off = (jamMode && cell.on);
-            game.seq.setSelected(key, row, col, off);
-            return;
-          }
-        }
-      });
-    }
-  });
-
-  // detect mouse dragging
-  const dragging = {};
-  $canvas.on("mousedown", (ev) => {
-    // block interactions
     if (game.state.overlayVisible) {
       return;
     }
-    const { offsetX, offsetY } = ev;
     // check grid cells
     game.seq.cells.forEach((cell) => {
-      const { key, x, y, w, h } = cell;
+      const { key, x, y, w, h, col, row, on } = cell;
       if (offsetX > x && offsetX < x + w) {
         if (offsetY > y && offsetY < y + h) {
           dragging.type = `cell/${key}`;
           dragging.target = cell;
+          dragging.from = [offsetX, offsetY];
+          const off = (jamMode && on === true);
+          game.seq.setSelected(key, row, col, off);
           return;
         }
       }
@@ -76,15 +60,25 @@ function pluginCanvas() {
     const { offsetX, offsetY } = ev;
     // select each dragged over grid cell
     if (dragging.type?.indexOf("cell") === 0) {
-      game.seq.cells.forEach((cell) => {
-        const { key, row, col, x, y, w, h } = cell;
-        if (offsetX > x && offsetX < x + w) {
-          if (offsetY > y && offsetY < y + h) {
-            game.seq.setSelected(key, row, col);
-            return;
+      // check distance dragged from mousedown event
+      const [startX, startY] = dragging.from;
+      const dx = offsetX - startX;
+      const dy = offsetY - startY;
+      // pythagorean distance
+      if (Math.sqrt(dx * dx + dy * dy) > 5){
+        // go through every cell
+        game.seq.cells.forEach((cell) => {
+          const { key, row, col, x, y, w, h } = cell;
+          // check for intersection
+          if (offsetX > x && offsetX < x + w) {
+            if (offsetY > y && offsetY < y + h) {
+              // activate cell
+              game.seq.setSelected(key, row, col);
+              return;
+            }
           }
-        }
-      });
+        });
+      }
     }
     // move the active slider up/down
     if (dragging.type === "slider") {
@@ -98,6 +92,7 @@ function pluginCanvas() {
   $canvas.on("mouseup", (ev) => {
     dragging.type = null;
     dragging.target = null;
+    dragging.from = null;
   });
 
   // todo: detect touch dragging
@@ -193,6 +188,7 @@ function pluginCanvas() {
     ctx.letterSpacing = "1px";
     ctx.textRendering = "optimizeLegibility";
     ctx.fillText(value, x, y, w);
+    ctx.letterSpacing = "0px";
   };
 
   // generic drawing of rounded box element

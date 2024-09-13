@@ -52,7 +52,7 @@ function pluginAudio() {
   };
 
   // draw analyzer graph of the audio stream
-  const renderAnalyzer = (node, { x, y, w, h, s, hue, alpha }) => {
+  const renderAnalyzer = (node, { x, y, w, h, s, hue, alpha=1 }) => {
     const { ctx } = game.canvas;
     // draw the frequency line
     ctx.lineWidth = s;
@@ -72,6 +72,7 @@ function pluginAudio() {
     }
     ctx.lineTo(w + x, y + h / 2);
     ctx.stroke();
+    ctx.closePath();
   };
 
   // synth lead ~ A4/4
