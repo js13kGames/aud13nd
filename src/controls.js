@@ -64,8 +64,16 @@ function pluginControls() {
 
     const { volume, tempo } = game.state;
 
+    // left to right
     let dx = 0;
     const width = 40;
+
+    // top to bottom
+    let dy = 0;
+    const height = 30;
+
+    // right to left
+    let dxr = 0;
 
     // give envelope controls for two main instruments
     ["lead","bass"].forEach(key => {
@@ -85,12 +93,10 @@ function pluginControls() {
           onChange: (v) => setParams(key, { [param]: parseFloat(v) }),
         });
         dx += width;
-      })
-
-      let dy = 0;
-      let height = 30;
+      });
 
       // waveform buttons
+      dy = 0;
       const { wave } = game.state[key].params;
       ["sawtooth","sine","square","triangle"].forEach(value => {
         drawButton({
@@ -104,7 +110,7 @@ function pluginControls() {
           onChange: () => setParams(key, { wave: value }),
         });
         dy += height;
-      })
+      });
 
       drawLabel({
         value: "WAVE",
@@ -116,146 +122,10 @@ function pluginControls() {
       dx += width + width/2;
     })
 
-    game.audio.renderAnalyzers({
-      x: x + dx,
-      y: y,
-      w: w - dx - 3 * 60 - 6 * 40,
-      h: h,
-      ...props,
-      alpha: 1,
-    });
-
-    drawSlider({
-      label: "LEAD",
-      x: x + w - 3 * 60 - 6 * 40,
-      y: y,
-      w: 40,
-      h: h,
-      ...props,
-      value: game.state.lead.params.gain,
-      min: 0.00001,
-      max: 1,
-      onChange: (v) => setParams("lead", { gain: parseFloat(v) }),
-    });
-
-    drawSlider({
-      label: "BASS",
-      x: x + w - 3 * 60 - 5 * 40,
-      y: y,
-      w: 40,
-      h: h,
-      ...props,
-      value: game.state.bass.params.gain,
-      min: 0.00001,
-      max: 1,
-      onChange: (v) => setParams("bass", { gain: parseFloat(v) }),
-    });
-
-    drawSlider({
-      label: "KICK",
-      x: x + w - 3 * 60 - 4 * 40,
-      y: y,
-      w: 40,
-      h: h,
-      ...props,
-      value: game.state.kick.params.gain,
-      min: 0.00001,
-      max: 1,
-      onChange: (v) => setParams("kick", { gain: parseFloat(v) }),
-    });
-
-    drawSlider({
-      label: "SNARE",
-      x: x + w - 3 * 60 - 3 * 40,
-      y: y,
-      w: 40,
-      h: h,
-      ...props,
-      value: game.state.snare.params.gain,
-      min: 0.00001,
-      max: 1,
-      onChange: (v) => setParams("snare", { gain: parseFloat(v) }),
-    });
-
-    drawSlider({
-      label: "HATS",
-      x: x + w - 3 * 60 - 2 * 40,
-      y: y,
-      w: 40,
-      h: h,
-      ...props,
-      value: game.state.hat.params.gain,
-      min: 0.00001,
-      max: 1,
-      onChange: (v) => setParams("hat", { gain: parseFloat(v) }),
-    });
-
+    // run control
+    dxr += 120;
     drawButton({
-      x: x + w - 3 * 60 - 1 * 40,
-      y: y,
-      w: 40,
-      h: 30,
-      ...props,
-      value: "240",
-      on: tempo == 240,
-      onChange: () => game.set("tempo", 240),
-    });
-
-    drawButton({
-      x: x + w - 3 * 60 - 1 * 40,
-      y: y + 30,
-      w: 40,
-      h: 30,
-      ...props,
-      value: "180",
-      on: tempo == 180,
-      onChange: () => game.set("tempo", 180),
-    });
-
-    drawButton({
-      x: x + w - 3 * 60 - 1 * 40,
-      y: y + 60,
-      w: 40,
-      h: 30,
-      ...props,
-      value: "120",
-      on: tempo == 120,
-      onChange: () => game.set("tempo", 120),
-    });
-
-    drawButton({
-      x: x + w - 3 * 60 - 1 * 40,
-      y: y + 90,
-      w: 40,
-      h: 30,
-      ...props,
-      value: "60",
-      on: tempo == 60,
-      onChange: () => game.set("tempo", 60),
-    });
-
-    drawLabel({
-      value: "BPM",
-      x: x + w - 3 * 60 - 1 * 40 + 20,
-      y: y + 120 + props.p,
-      w: 40,
-    });
-
-    drawSlider({
-      label: "VOLUME",
-      x: x + w - 3 * 60,
-      y: y,
-      w: 60,
-      h: h,
-      ...props,
-      value: volume,
-      min: 0.00001,
-      max: 2,
-      onChange: (v) => game.set("volume", parseFloat(v)),
-    });
-
-    drawButton({
-      x: x + w - 2 * 60,
+      x: x + w - dxr,
       y: y,
       w: 120,
       h: 120,
@@ -270,6 +140,73 @@ function pluginControls() {
           game.pause();
         }
       },
+    });
+
+    // final gain
+    dxr += 60;
+    drawSlider({
+      label: "VOLUME",
+      x: x + w - dxr,
+      y: y,
+      w: 60,
+      h: h,
+      ...props,
+      value: volume,
+      min: 0.00001,
+      max: 2,
+      onChange: (v) => game.set("volume", parseFloat(v)),
+    });
+
+    // tempo
+    dxr += width;
+    dy = 0;
+    [240, 180, 120, 60].forEach(bpm => {
+      drawButton({
+        x: x + w - dxr,
+        y: y + dy,
+        w: width,
+        h: height,
+        ...props,
+        value: bpm,
+        on: tempo == bpm,
+        onChange: () => game.set("tempo", bpm),
+      });
+      dy += height;
+    });
+
+    drawLabel({
+      value: "BPM",
+      x: x + w - dxr + 20,
+      y: y + dy + props.p,
+      w: width,
+    });
+
+    // instrument gains
+    dxr += width/2;
+    ["lead","bass","kick","snare","hat"].reverse().forEach(key => {
+      dxr += width;
+      drawSlider({
+        label: key.toUpperCase(),
+        x: x + w - dxr,
+        y: y,
+        w: width,
+        h: h,
+        ...props,
+        value: game.state[key].params.gain,
+        min: 0.00001,
+        max: 1,
+        onChange: (v) => setParams(key, { gain: parseFloat(v) }),
+      });
+    });
+
+    // fill the center with audio graph
+    game.audio.renderAnalyzers({
+      x: x + dx,
+      y: y,
+      w: w - dx - dxr - width/2,
+      h: h,
+      ...props,
+      alpha: 1,
     });
 
     // aud13nd
