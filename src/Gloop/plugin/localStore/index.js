@@ -7,7 +7,8 @@ export default function pluginLocalStore(opts = {}) {
   const replacer = (key, value) => (lookup.has(key) ? value : undefined);
   // read state from local storage on initialization
   try {
-    game.set(JSON.parse(localStorage.getItem(name), replacer));
+    const saved = localStorage.getItem(name);
+    game.set(saved == null ? initial : JSON.parse(saved, replacer));
   } catch (ex) {
     console.log(ex);
     game.set(initial);
